@@ -64,6 +64,24 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/syncCalendar"
+        },
+        {
+            "$id": "syncCalendarScheduler",
+            "name": "syncCalendarScheduler",
+            "runtime": "go-1.22",
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "main.go",
+            "commands": "",
+            "path": "functions/syncCalendarScheduler",
+            "scopes": [
+                "databases.read",
+                "execution.write"
+            ]
         }
     ]
 }
