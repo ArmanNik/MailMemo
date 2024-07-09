@@ -49,6 +49,20 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMails"
+        },
+        {
+            "$id": "syncCalendar",
+            "name": "syncCalendar",
+            "runtime": "go-1.22",
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "main.go",
+            "commands": "",
+            "path": "functions/syncCalendar"
         }
     ]
 }

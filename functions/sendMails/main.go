@@ -14,13 +14,9 @@ import (
 )
 
 func Main(Context *types.Context) types.ResponseOutput {
-	if Context.Req.Path != "/send" || Context.Req.Method != "POST" {
+	if Context.Req.Method != "POST" {
 		return Context.Res.Text("Not Found", 404, nil)
 	}
-
-	Context.Log(Context.Req.Headers["x-appwrite-key"])
-	Context.Log(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
-	Context.Log(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
 
 	appwriteClient := client.NewClient()
 	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
@@ -57,7 +53,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	var mjmlError mjml.Error
 	if errors.As(err, &mjmlError) {
 		errorAsJson, _ := json.Marshal(mjmlError)
-		Context.Log(string(errorAsJson[:]))
+		Context.Error(string(errorAsJson[:]))
 	}
 
 	message, err := appwriteMessaging.CreateEmail(
@@ -71,11 +67,11 @@ func Main(Context *types.Context) types.ResponseOutput {
 	)
 
 	if err != nil {
-		Context.Log(err.Error())
+		Context.Error(err)
 		return Context.Res.Text("Error", 500, nil)
 	}
 
-	Context.Log(message.Id)
+	Context.Log("Message ID: " + message.Id)
 
 	return Context.Res.Text("OK", 200, nil)
 }
