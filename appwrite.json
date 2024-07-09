@@ -48,7 +48,8 @@
             "logging": true,
             "entrypoint": "main.go",
             "commands": "",
-            "path": "functions/sendMails"
+            "path": "functions/sendMails",
+            "scopes": []
         },
         {
             "$id": "syncCalendar",
