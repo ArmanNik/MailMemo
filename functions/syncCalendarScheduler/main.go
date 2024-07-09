@@ -38,10 +38,12 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 		if cursor == "INIT" {
 			queries = []interface{}{
+				query.Select([]interface{}{"$id"}),
 				query.Limit(50),
 			}
 		} else {
 			queries = []interface{}{
+				query.Select([]interface{}{"$id"}),
 				query.Limit(50),
 				query.CursorAfter(cursor),
 			}
@@ -55,24 +57,34 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 		var wg sync.WaitGroup
 		wg.Add(len(listResponse.Documents))
+		errCh := make(chan error, len(listResponse.Documents))
 
 		for _, document := range listResponse.Documents {
 			calendarDocument := document.(map[string]interface{})
 			id := calendarDocument["$id"].(string)
 
-			go func() {
+			go func(id string) {
 				defer wg.Done()
 
-				appwriteFunctions.CreateExecution(
+				_, err := appwriteFunctions.CreateExecution(
 					"syncCalendar",
 					functions.WithCreateExecutionAsync(true),
 					functions.WithCreateExecutionMethod("POST"),
 					functions.WithCreateExecutionBody(id),
 				)
-			}()
+				if err != nil {
+					errCh <- err
+				}
+			}(id)
 		}
 
 		wg.Wait()
+		close(errCh)
+
+		for err := range errCh {
+			Context.Error(err)
+			return Context.Res.Text("Error", 500, nil)
+		}
 
 		if len(listResponse.Documents) > 0 {
 			lastDocument := listResponse.Documents[len(listResponse.Documents)-1].(map[string]interface{})

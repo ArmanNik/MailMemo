@@ -2,33 +2,16 @@
 
 ## 🧰 Usage
 
-### GET /
+### POST /
 
-- Returns a "Hello, World!" message.
+- Executes `syncCalendar` for each calendar.
 
 **Response**
 
 Sample `200` Response:
 
 ```text
-Hello, World!
-```
-
-### POST, PUT, PATCH, DELETE /
-
-- Returns a "Learn More" JSON response.
-
-**Response**
-
-Sample `200` Response:
-
-```json
-{
-  "motto": "Build like a team of hundreds_",
-  "learn": "https://appwrite.io/docs",
-  "connect": "https://appwrite.io/discord",
-  "getInspired": "https://builtwith.appwrite.io"
-}
+OK
 ```
 
 ## ⚙️ Configuration
@@ -36,9 +19,10 @@ Sample `200` Response:
 | Setting           | Value         |
 | ----------------- | ------------- |
 | Runtime           | Go (1.22)     |
-| Entrypoint        | `src/main.go` |
-| Permissions       | `any`         |
-| Timeout (Seconds) | 15            |
+| Entrypoint        | `main.go`     |
+| Cron              | `*/15 * * * *`|
+| Timeout (Seconds) | 900           |
+| Scopes            | `execution.write`, `databases.read` |
 
 ## 🔒 Environment Variables
 

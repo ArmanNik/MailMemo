@@ -1,15 +1,11 @@
 package handler
 
 import (
-	"context"
-	"encoding/json"
-	"errors"
+	"net/http"
 	"os"
+	"time"
 
-	"github.com/Boostport/mjml-go"
-	"github.com/appwrite/sdk-for-go/client"
-	"github.com/appwrite/sdk-for-go/id"
-	"github.com/appwrite/sdk-for-go/messaging"
+	"github.com/apognu/gocal"
 	"github.com/open-runtimes/types-for-go/v4"
 )
 
@@ -18,60 +14,33 @@ func Main(Context *types.Context) types.ResponseOutput {
 		return Context.Res.Text("Not Found", 404, nil)
 	}
 
-	appwriteClient := client.NewClient()
-	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
-	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
-	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
+	url := Context.Req.BodyText()
 
-	appwriteMessaging := messaging.NewMessaging(appwriteClient)
-
-	subject := "MJML E-mail"
-	input := `
-		<mjml>
-			<mj-body>
-				<mj-section>
-					<mj-column>
-						<mj-divider border-color="#F45E43"></mj-divider>
-						<mj-text font-size="20px" color="#F45E43" font-family="helvetica">
-							Hello World
-						</mj-text>
-					</mj-column>
-				</mj-section>
-			</mj-body>
-		</mjml>
-	`
-
-	output, err := mjml.ToHTML(
-		context.Background(),
-		input,
-		mjml.WithValidationLevel(mjml.Strict),
-		mjml.WithBeautify(false),
-		mjml.WithMinify(true),
-		mjml.WithKeepComments(false),
-	)
-
-	var mjmlError mjml.Error
-	if errors.As(err, &mjmlError) {
-		errorAsJson, _ := json.Marshal(mjmlError)
-		Context.Error(string(errorAsJson[:]))
+	if os.Getenv("APPWRITE_ENV") == "development" {
+		url = "https://calendar.google.com/calendar/ical/e251560319ad845251b578e5a88962f3c20cf07a6900a462f75cb42c7dc898ca%40group.calendar.google.com/private-67520c9a35acde3e6ab144529aa7f389/basic.ics"
 	}
 
-	message, err := appwriteMessaging.CreateEmail(
-		id.Unique(),
-		subject,
-		output,
-		messaging.WithCreateEmailHtml(true),
-		messaging.WithCreateEmailUsers([]interface{}{
-			Context.Req.Headers["x-appwrite-user-id"],
-		}),
-	)
-
+	calResp, err := http.Get(url)
 	if err != nil {
 		Context.Error(err)
 		return Context.Res.Text("Error", 500, nil)
 	}
 
-	Context.Log("Message ID: " + message.Id)
+	defer calResp.Body.Close()
+
+	start, end := time.Now(), time.Now().Add(12*30*24*time.Hour)
+
+	c := gocal.NewParser(calResp.Body)
+	c.Start, c.End = &start, &end
+	c.Parse()
+
+	Context.Log("Reading")
+
+	for _, e := range c.Events {
+		Context.Log(e.Summary)
+	}
+
+	Context.Log("End of it")
 
 	return Context.Res.Text("OK", 200, nil)
 }
