@@ -1,0 +1,237 @@
+{
+    "projectId": "mail-memo",
+    "projectName": "Mail Memo",
+    "settings": {
+        "services": {
+            "account": true,
+            "avatars": true,
+            "databases": true,
+            "locale": false,
+            "health": false,
+            "storage": false,
+            "teams": false,
+            "users": true,
+            "functions": true,
+            "graphql": true,
+            "messaging": true
+        },
+        "auth": {
+            "methods": {
+                "jwt": false,
+                "phone": false,
+                "invites": false,
+                "anonymous": false,
+                "email-otp": false,
+                "magic-url": false,
+                "email-password": true
+            },
+            "security": {
+                "duration": 31536000,
+                "limit": 0,
+                "sessionsLimit": 10,
+                "passwordHistory": 0,
+                "passwordDictionary": false,
+                "personalDataCheck": false
+            }
+        }
+    },
+    "functions": [
+        {
+            "$id": "sendMails",
+            "name": "sendMails",
+            "runtime": "go-1.22",
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "main.go",
+            "commands": "",
+            "path": "functions/sendMails",
+            "scopes": []
+        },
+        {
+            "$id": "syncCalendar",
+            "name": "syncCalendar",
+            "runtime": "go-1.22",
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 900,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "main.go",
+            "commands": "",
+            "path": "functions/syncCalendar",
+            "scopes": [
+                "documents.read",
+                "documents.write"
+            ]
+        },
+        {
+            "$id": "syncCalendarScheduler",
+            "name": "syncCalendarScheduler",
+            "runtime": "go-1.22",
+            "execute": [],
+            "events": [],
+            "schedule": "*/15 * * * *",
+            "timeout": 900,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "main.go",
+            "commands": "",
+            "path": "functions/syncCalendarScheduler",
+            "scopes": [
+                "documents.read",
+                "execution.write"
+            ]
+        },
+        {
+            "$id": "sendMailsScheduler",
+            "name": "sendMailsScheduler",
+            "runtime": "go-1.22",
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "main.go",
+            "commands": "",
+            "path": "functions/sendMailsScheduler",
+            "scopes": []
+        },
+        {
+            "$id": "api",
+            "name": "api",
+            "runtime": "go-1.22",
+            "execute": ["users"],
+            "scopes": ["users.write"],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "main.go",
+            "commands": "",
+            "path": "functions/api"
+        }
+    ],
+    "databases": [
+        {
+            "$id": "main",
+            "name": "main",
+            "enabled": true
+        }
+    ],
+    "collections": [
+        {
+            "$id": "calendars",
+            "$permissions": [],
+            "databaseId": "main",
+            "name": "calendars",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "userId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "url",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 2048,
+                    "default": null
+                },
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "color",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 7,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "events",
+            "$permissions": [],
+            "databaseId": "main",
+            "name": "events",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "calendarId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "description",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 2048,
+                    "default": null
+                },
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "uid",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "modifiedAt",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "startAt",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "endAt",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        }
+    ]
+}
