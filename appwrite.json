@@ -101,6 +101,21 @@
             "commands": "",
             "path": "functions/sendMailsScheduler",
             "scopes": []
+        },
+        {
+            "$id": "api",
+            "name": "api",
+            "runtime": "go-1.22",
+            "execute": [],
+            "scopes": ["users.write"],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "main.go",
+            "commands": "",
+            "path": "functions/api"
         }
     ],
     "databases": [
