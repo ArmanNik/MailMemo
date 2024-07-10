@@ -1,4 +1,10 @@
-<div class="mt-12">
-	<p>Step X</p>
-	<slot />
+<script>
+	import { step } from './store';
+</script>
+
+<div class="mt-4 flex h-full grow flex-col">
+	<p>Step {$step}</p>
+	<div class="flex h-full grow flex-col justify-between">
+		<slot />
+	</div>
 </div>

@@ -32,7 +32,7 @@
 	}
 </script>
 
-<div class="h-full w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+<div class="flex h-full min-h-[100vh] w-full flex-col lg:grid lg:grid-cols-2">
 	<div class="hidden bg-muted lg:block">
 		<img
 			src="/images/placeholder.svg"
@@ -43,14 +43,14 @@
 		/>
 	</div>
 	<div class="mt-8 block text-center lg:hidden">logo</div>
-	<div class="flex h-full flex-col items-center justify-between">
+	<div class="flex h-full grow flex-col items-center justify-between py-8">
 		<div class="flex items-center justify-center py-12">
 			<div class="mx-auto grid w-[350px] gap-6">
 				<div class="grid gap-2">
 					<h1 class="text-3xl font-bold">Sign in</h1>
 					<p class="text-balance text-muted-foreground">Sign in to continue</p>
 				</div>
-				<form class="grid gap-4" on:submit={handleSubmit}>
+				<form class="grid gap-4" on:submit|preventDefault={handleSubmit}>
 					<div class="grid gap-2">
 						<Input
 							id="email"
@@ -82,7 +82,7 @@
 				</form>
 			</div>
 		</div>
-		<div class="mt-auto text-center text-sm">
+		<div class="text-center text-sm sm:mt-auto">
 			Don't have an account?
 			<a href="/register" class="underline"> Sign up </a>
 		</div>
