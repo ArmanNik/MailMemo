@@ -99,7 +99,8 @@
             "logging": true,
             "entrypoint": "main.go",
             "commands": "",
-            "path": "functions/sendMailsScheduler"
+            "path": "functions/sendMailsScheduler",
+            "scopes": []
         }
     ],
     "databases": [
@@ -140,6 +141,14 @@
                     "required": true,
                     "array": false,
                     "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "color",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 7,
                     "default": null
                 }
             ],
