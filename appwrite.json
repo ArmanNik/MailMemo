@@ -49,9 +49,7 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMails",
-            "scopes": [
-                "messages.write"
-            ]
+            "scopes": []
         },
         {
             "$id": "syncCalendar",
@@ -88,6 +86,20 @@
                 "documents.read",
                 "execution.write"
             ]
+        },
+        {
+            "$id": "sendMailsScheduler",
+            "name": "sendMailsScheduler",
+            "runtime": "go-1.22",
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "main.go",
+            "commands": "",
+            "path": "functions/sendMailsScheduler"
         }
     ],
     "databases": [
