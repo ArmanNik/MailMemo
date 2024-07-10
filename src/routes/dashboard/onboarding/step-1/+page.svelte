@@ -9,6 +9,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
 	import { ID } from 'appwrite';
+	import { user } from '$lib/stores';
 
 	let selectedProvider: 'google' | 'apple' | 'outlook' | 'url' | null = null;
 	let name = '';
@@ -27,7 +28,12 @@
 		}
 		if (selectedProvider === 'url') {
 			try {
-				await databases.createDocument('db', 'calendars', ID.unique(), { name, url, color });
+				await databases.createDocument('main', 'calendars', ID.unique(), {
+					userId: $user?.$id,
+					name,
+					url,
+					color
+				});
 				await goto('/dashboard/onboarding/step-1');
 			} catch (error) {
 				console.log(error);
@@ -44,7 +50,7 @@
 
 <div>
 	<h1 class="mt-6 text-3xl font-bold">Connect a calendar to get started</h1>
-	<p class="text-balance text-muted-foreground">
+	<p class="mt-4 text-balance text-muted-foreground">
 		Link your preferred calendar to seamlessly manage all your important events and reminders.
 	</p>
 	{#if !selectedProvider}
@@ -271,6 +277,14 @@
 			<div class="grid gap-2">
 				<Label for="url">Calendar URL</Label>
 				<Input id="url" type="url" placeholder="Enter URL" required bind:value={url} />
+				<p class="text-sm text-muted-foreground">
+					You can find iCal address in sharing options in your calendar settings. <a
+						href="http://appwrite.io"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="underline">Learn more</a
+					>
+				</p>
 			</div>
 			<div class="grid gap-2">
 				<Label for="url">Calendar name</Label>
@@ -282,7 +296,7 @@
 					{#each colors as c}
 						<button
 							type="button"
-							class={`border-separate rounded-full border text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-primary `}
+							class={`border-separate rounded-full border text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:border-primary `}
 							disabled={color === c}
 							on:click={() => (color = c)}
 						>

@@ -4,9 +4,9 @@ import { get } from 'svelte/store';
 
 export const load = async ({ parent }) => {
 	const u = get(user);
-	if (u?.prefs?.frequency && u?.prefs?.interval && u?.prefs?.time) {
-		redirect(303, `/dashboard/overview`);
-	} else {
-		redirect(303, `/dashboard/onboarding/step-1`);
-	}
+	// if (u?.prefs?.onboarded) {
+	// 	redirect(303, `/dashboard/overview`);
+	// } else {
+	// 	redirect(303, `/dashboard/onboarding/step-1`);
+	// }
 };
