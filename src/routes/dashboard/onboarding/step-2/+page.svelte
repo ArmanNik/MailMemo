@@ -6,10 +6,12 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
+	import { functions } from '$lib/sdk';
+	import { ExecutionMethod } from 'appwrite';
 
 	let hour: string;
 	let minute: string;
-	let period: string = 'AM';
+	let format: string = 'AM';
 	let form: HTMLFormElement;
 
 	onMount(() => {
@@ -21,10 +23,48 @@
 			form.requestSubmit();
 		}
 		try {
-			await goto('/dashboard/onboarding/step-3');
+			const cestDate = transformLocalToCEST(hour, minute, format);
+			const cestHour = cestDate.getHours().toString();
+			const cestMinute = cestDate.getMinutes().toString();
+
+			const execution = await functions.createExecution(
+				'api',
+				JSON.stringify({ cestHour, cestMinute, format }),
+				false,
+				'/v1/scheduler/intervals',
+				ExecutionMethod.PATCH
+			);
+			const isOk = execution.responseStatusCode;
+
+			if (!isOk) {
+				alert(
+					execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
+				);
+				return;
+			} else {
+				await goto('/dashboard/onboarding/step-3');
+			}
 		} catch (error) {
 			console.log(error);
 		}
+	}
+
+	function transformLocalToCEST(hour: string, minute: string, format: string) {
+		const intHour = format === 'PM' ? parseInt(hour) + 12 : parseInt(hour);
+		const date = new Date();
+		date.setHours(intHour);
+		date.setMinutes(parseInt(minute));
+		date.setSeconds(0);
+		date.setMilliseconds(0);
+		const cestDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+		return cestDate;
+	}
+
+	$: if (hour && minute && format) {
+		const cestDate = transformLocalToCEST(hour, minute, format);
+		const cestHour = cestDate.getHours().toString();
+		const cestMinute = cestDate.getMinutes().toString();
+		console.log(cestHour, cestMinute);
 	}
 </script>
 
@@ -41,15 +81,31 @@
 	<form class="mt-20" on:submit|preventDefault bind:this={form}>
 		<Label for="url">Time</Label>
 		<div class="flex items-center gap-4">
-			<Input id="hour" type="number" placeholder="09" required bind:value={hour} />
+			<Input
+				id="hour"
+				type="number"
+				placeholder="Hour"
+				min="0"
+				max="12"
+				required
+				bind:value={hour}
+			/>
 			<span class="text-xl font-bold">:</span>
-			<Input id="hour" type="number" placeholder="00" required bind:value={minute} />
+			<Input
+				id="hour"
+				type="number"
+				placeholder="Minutes"
+				min="0"
+				max="59"
+				required
+				bind:value={minute}
+			/>
 			<Select.Root
 				required
 				items={[{ value: 'AM' }, { value: 'PM' }]}
 				onSelectedChange={(s) => {
 					if (s?.value) {
-						period = s.value;
+						format = s.value;
 					}
 				}}
 			>

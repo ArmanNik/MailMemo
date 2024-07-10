@@ -7,9 +7,29 @@
 	import { account } from '$lib/sdk';
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import { user } from '$lib/stores';
+	import * as Select from '$lib/components/ui/select';
 
 	let frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'daily';
+	let frequencyDetail: string = '';
 	let form: HTMLFormElement;
+
+	const monthlyDetailOptions = [
+		{ value: 'day1', label: 'First day' },
+		{ value: 'dayLast', label: 'Last day' },
+		{ value: 'dayBeforeLast', label: 'Day before last' },
+		{ value: 'day7', label: 'After 7 days' },
+		{ value: 'day14', label: 'After 14 days' }
+	];
+
+	const weeklyDetailOptions = [
+		{ value: '0', label: 'Monday' },
+		{ value: '1', label: 'Tuesday' },
+		{ value: '2', label: 'Wednesday' },
+		{ value: '3', label: 'Thursday' },
+		{ value: '4', label: 'Friday' },
+		{ value: '5', label: 'Saturday' },
+		{ value: '6', label: 'Sunday' }
+	];
 
 	onMount(() => {
 		step.set(4);
@@ -22,9 +42,11 @@
 		try {
 			await account.updatePrefs({
 				...$user.prefs,
-				frequency
+				frequency,
+				frequencyDetail,
+				onboarded: true
 			});
-			await goto('/dashboard/onboarding/overview');
+			await goto('/dashboard');
 		} catch (error) {
 			console.log(error);
 		}
@@ -43,18 +65,56 @@
 
 	<form class="mt-20" on:submit|preventDefault bind:this={form}>
 		<RadioGroup.Root bind:value={frequency}>
-			<div class="flex flex-col gap-5">
-				<div class="flex items-center space-x-2 px-1 py-2">
+			<div class="flex flex-col gap-4">
+				<div class="flex min-h-10 items-center space-x-2 px-1">
 					<RadioGroup.Item value="daily" id="daily" />
 					<Label for="daily">Daily</Label>
 				</div>
-				<div class="flex items-center space-x-2 px-1 py-2">
+				<div class="flex min-h-10 items-center space-x-2 px-1">
 					<RadioGroup.Item value="weekly" id="weekly" />
 					<Label for="weekly">Weekly</Label>
+					{#if frequency === 'weekly'}
+						<Select.Root
+							items={weeklyDetailOptions}
+							onSelectedChange={(s) => {
+								if (s?.value) {
+									frequencyDetail = s.value;
+								}
+							}}
+						>
+							<Select.Trigger class="w-[180px]">
+								<Select.Value placeholder="Day in week" />
+							</Select.Trigger>
+							<Select.Content>
+								{#each weeklyDetailOptions as option}
+									<Select.Item value={option.value} hideCheck>{option.label}</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/if}
 				</div>
-				<div class="flex items-center space-x-2 px-1 py-2">
+				<div class="flex min-h-10 items-center space-x-2 px-1">
 					<RadioGroup.Item value="monthly" id="monthly" />
 					<Label for="monthly">Monthly</Label>
+					{#if frequency === 'monthly'}
+						<Select.Root
+							items={monthlyDetailOptions}
+							onSelectedChange={(s) => {
+								if (s?.value) {
+									frequencyDetail = s.value;
+								}
+							}}
+						>
+							<Select.Trigger class="w-[180px]">
+								<Select.Value placeholder="Day in month" />
+							</Select.Trigger>
+							<Select.Content>
+								{#each monthlyDetailOptions as option}
+									<Select.Item value={option.value} hideCheck>{option.label}</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/if}
 				</div>
 			</div>
 		</RadioGroup.Root>

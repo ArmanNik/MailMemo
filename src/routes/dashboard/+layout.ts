@@ -1,3 +1,6 @@
 export const load = async ({ parent }) => {
-	await parent();
+	const { user } = await parent();
+	return {
+		user
+	};
 };
