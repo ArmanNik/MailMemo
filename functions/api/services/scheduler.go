@@ -10,9 +10,11 @@ import (
 )
 
 type UpdateSchedulerIntervalBody struct {
-	Minutes int    `json:"minutes"`
-	Hours   int    `json:"hours"`
-	Format  string `json:"format"`
+	Minutes          int    `json:"minutes"`
+	Hours            int    `json:"hours"`
+	Format           string `json:"format"`
+	Frequency        string `json:"frequency"`
+	FrequencyDetails string `json:"frequencyDetails"`
 }
 
 func UpdateSchedulerInterval(Context *types.Context, appwriteClient client.Client) types.ResponseOutput {
@@ -27,12 +29,36 @@ func UpdateSchedulerInterval(Context *types.Context, appwriteClient client.Clien
 		return Context.Res.Text("Format must be 'am' or 'pm'", 400, nil)
 	}
 
+	if body.Frequency != "daily" && body.Frequency != "weekly" && body.Frequency != "monthly" {
+		return Context.Res.Text("Frequency must be 'daily' or 'weekly' or 'monthly'", 400, nil)
+	}
+
 	if body.Minutes < 0 || body.Minutes > 59 {
 		return Context.Res.Text("Minutes must be between 0 and 59", 400, nil)
 	}
 
 	if body.Hours < 0 || body.Hours > 11 {
 		return Context.Res.Text("Hours must be between 0 and 11", 400, nil)
+	}
+
+	if body.Frequency == "weekly" {
+		dayOfWeek, err := strconv.Atoi(body.FrequencyDetails)
+		if err != nil || dayOfWeek < 0 || dayOfWeek > 6 {
+			return Context.Res.Text("When frequency is 'weekly', frequencyDetails must be a number between 0 and 6", 400, nil)
+		}
+	}
+
+	if body.Frequency == "monthly" {
+		if body.FrequencyDetails != "day1" &&
+			body.FrequencyDetails != "day7" &&
+			body.FrequencyDetails != "day14" &&
+			body.FrequencyDetails != "dayLast" &&
+			body.FrequencyDetails != "dayBeforeLast" {
+			return Context.Res.Text("When frequency is 'monthly', frequencyDetails must be 'day1' or 'day7' or 'day14' or 'dayLast' or 'dayBeforeLast'", 400, nil)
+		}
+	}
+
+	if body.Frequency == "weekly" {
 	}
 
 	// Ensure it's user-executed
@@ -42,7 +68,7 @@ func UpdateSchedulerInterval(Context *types.Context, appwriteClient client.Clien
 	}
 
 	// Action
-	label := strconv.Itoa(body.Hours) + "T" + strconv.Itoa(body.Minutes) + "T" + body.Format
+	label := strconv.Itoa(body.Hours) + "T" + strconv.Itoa(body.Minutes) + "T" + body.Format + "T" + body.Frequency + "T" + body.FrequencyDetails
 
 	appwriteUsers := users.NewUsers(appwriteClient)
 	_, err = appwriteUsers.UpdateLabels(userId, []interface{}{

@@ -106,8 +106,12 @@
             "$id": "api",
             "name": "api",
             "runtime": "go-1.22",
-            "execute": ["users"],
-            "scopes": ["users.write"],
+            "execute": [
+                "users"
+            ],
+            "scopes": [
+                "users.write"
+            ],
             "events": [],
             "schedule": "",
             "timeout": 15,
@@ -128,7 +132,9 @@
     "collections": [
         {
             "$id": "calendars",
-            "$permissions": [],
+            "$permissions": [
+                "create(\"users\")"
+            ],
             "databaseId": "main",
             "name": "calendars",
             "enabled": true,
