@@ -8,8 +8,8 @@
 
 	onMount(async () => {
 		if ($user?.$id) {
-			const acceptedRoutes = ['/login', '/register', '/recover'];
-			if (acceptedRoutes.some((n) => $page.url.pathname.startsWith(n))) {
+			const skippedRoutes = ['/login', '/register', '/recover', '/'];
+			if (skippedRoutes.some((n) => $page.url.pathname.startsWith(n))) {
 				await goto('/dashboard');
 			}
 		}

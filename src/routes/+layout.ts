@@ -17,6 +17,5 @@ export const load = async ({ depends, url }) => {
 		if (!acceptedRoutes.some((n) => url.pathname.startsWith(n))) {
 			redirect(303, `/login`);
 		}
-		return {};
 	}
 };
