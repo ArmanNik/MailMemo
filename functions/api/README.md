@@ -1,34 +1,33 @@
-# api
+# API
 
 ## 🧰 Usage
 
-### GET /
+### PATCH /v1/scheduler/intervals
 
-- Returns a "Hello, World!" message.
+- Sets user's label based on his onboarding prefferences.
+
+**Request**
+
+```json
+{
+  "hours": 9,
+  "minutes": 20,
+  "format": "am"
+}
+```
 
 **Response**
 
 Sample `200` Response:
 
 ```text
-Hello, World!
+OK
 ```
 
-### POST, PUT, PATCH, DELETE /
+Sample `4XX` or `5XX` Response:
 
-- Returns a "Learn More" JSON response.
-
-**Response**
-
-Sample `200` Response:
-
-```json
-{
-  "motto": "Build like a team of hundreds_",
-  "learn": "https://appwrite.io/docs",
-  "connect": "https://appwrite.io/discord",
-  "getInspired": "https://builtwith.appwrite.io"
-}
+```text
+Error updating user labels
 ```
 
 ## ⚙️ Configuration
@@ -36,9 +35,9 @@ Sample `200` Response:
 | Setting           | Value         |
 | ----------------- | ------------- |
 | Runtime           | Go (1.22)     |
-| Entrypoint        | `src/main.go` |
-| Permissions       | `any`         |
+| Entrypoint        | `main.go`     |
 | Timeout (Seconds) | 15            |
+| Scopes            | `users.write` |
 
 ## 🔒 Environment Variables
 

@@ -106,7 +106,7 @@
             "$id": "api",
             "name": "api",
             "runtime": "go-1.22",
-            "execute": [],
+            "execute": ["users"],
             "scopes": ["users.write"],
             "events": [],
             "schedule": "",
