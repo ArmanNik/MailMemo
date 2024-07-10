@@ -4,6 +4,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { account } from '$lib/sdk';
+	import { OAuthProvider } from 'appwrite';
 
 	let email = '';
 	let password = '';
@@ -12,6 +13,19 @@
 		try {
 			await account.createEmailPasswordSession(email, password);
 			await goto('/dashboard');
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	async function handleGitHubLogin() {
+		try {
+			account.createOAuth2Session(
+				OAuthProvider.Github, // provider
+				'https://mail-memo.vercel.app/dashboard', // redirect here on success
+				'https://mail-memo.vercel.app/login', // redirect here on failure
+				['repo', 'user']
+			);
 		} catch (error) {
 			console.log(error);
 		}
@@ -47,7 +61,9 @@
 					<Input id="password" type="password" required />
 				</div>
 				<Button type="submit" class="w-full">Login</Button>
-				<Button variant="outline" class="w-full">Login with Google</Button>
+				<Button variant="outline" class="w-full" on:click={handleGitHubLogin}>
+					Login with GitHub
+				</Button>
 			</div>
 			<div class="mt-4 text-center text-sm">
 				Already have an account?
