@@ -117,7 +117,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	eventChunk = [100]EventMinimal{}
 
 	cursor := "INIT"
-	for ok := true; ok; ok = (cursor == "") {
+	for ok := true; ok; ok = (cursor != "") {
 		Context.Error("Existing page iteration")
 
 		var queries []interface{}

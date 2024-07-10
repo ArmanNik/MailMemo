@@ -10,6 +10,7 @@ import (
 	"github.com/appwrite/sdk-for-go/client"
 	"github.com/appwrite/sdk-for-go/id"
 	"github.com/appwrite/sdk-for-go/messaging"
+	"github.com/appwrite/sdk-for-go/users"
 	"github.com/open-runtimes/types-for-go/v4"
 )
 
@@ -18,12 +19,25 @@ func Main(Context *types.Context) types.ResponseOutput {
 		return Context.Res.Text("Not Found", 404, nil)
 	}
 
+	userId := Context.Req.Headers["x-appwrite-user-id"]
+
+	if userId == "" {
+		userId = Context.Req.BodyText()
+	}
+
 	appwriteClient := client.NewClient()
 	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
 	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
 	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
 
 	appwriteMessaging := messaging.NewMessaging(appwriteClient)
+	appwriteUsers := users.NewUsers(appwriteClient)
+
+	userStruct, userStructErr := appwriteUsers.Get(userId)
+	if userStructErr != nil {
+		Context.Error(userStructErr)
+		return Context.Res.Text("Error", 500, nil)
+	}
 
 	subject := "MJML E-mail"
 	input := `
@@ -80,7 +94,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 		output,
 		messaging.WithCreateEmailHtml(true),
 		messaging.WithCreateEmailUsers([]interface{}{
-			Context.Req.Headers["x-appwrite-user-id"],
+			userStruct.Id,
 		}),
 	)
 

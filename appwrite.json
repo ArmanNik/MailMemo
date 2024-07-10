@@ -49,7 +49,7 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMails",
-            "scopes": []
+            "scopes": ["messages.write"]
         },
         {
             "$id": "syncCalendar",
@@ -100,7 +100,7 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMailsScheduler",
-            "scopes": []
+            "scopes": ["users.read", "execution.write"]
         },
         {
             "$id": "api",

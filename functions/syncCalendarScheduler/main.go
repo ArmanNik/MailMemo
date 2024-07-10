@@ -31,7 +31,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	appwriteFunctions := functions.NewFunctions(appwriteClient)
 
 	cursor := "INIT"
-	for ok := true; ok; ok = (cursor == "") {
+	for ok := true; ok; ok = (cursor != "") {
 		Context.Error("Page iteration")
 
 		var queries []interface{}
