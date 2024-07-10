@@ -6,10 +6,10 @@
             "account": true,
             "avatars": true,
             "databases": true,
-            "locale": true,
-            "health": true,
-            "storage": true,
-            "teams": true,
+            "locale": false,
+            "health": false,
+            "storage": false,
+            "teams": false,
             "users": true,
             "functions": true,
             "graphql": true,
@@ -17,12 +17,12 @@
         },
         "auth": {
             "methods": {
-                "jwt": true,
-                "phone": true,
-                "invites": true,
-                "anonymous": true,
-                "email-otp": true,
-                "magic-url": true,
+                "jwt": false,
+                "phone": false,
+                "invites": false,
+                "anonymous": false,
+                "email-otp": false,
+                "magic-url": false,
                 "email-password": true
             },
             "security": {
