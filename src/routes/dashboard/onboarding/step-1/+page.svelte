@@ -48,6 +48,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Onboarding (step 1) - MailMemo</title>
+</svelte:head>
+
 <div>
 	<h1 class="mt-6 text-3xl font-bold">Connect a calendar to get started</h1>
 	<p class="mt-4 text-balance text-muted-foreground">

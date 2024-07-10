@@ -31,6 +31,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Onboarding (step 4) - MailMemo</title>
+</svelte:head>
+
 <div>
 	<h1 class="mt-6 text-3xl font-bold">Set the frequency of receiving reminders</h1>
 	<p class="mt-4 text-balance text-muted-foreground">

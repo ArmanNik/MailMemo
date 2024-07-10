@@ -60,3 +60,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.frosted {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+}

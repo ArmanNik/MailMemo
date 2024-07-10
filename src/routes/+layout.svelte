@@ -16,7 +16,9 @@
 	});
 </script>
 
-<svelte:head>MailMemo</svelte:head>
+<svelte:head>
+	<title>MailMemo</title>
+</svelte:head>
 
 <ModeWatcher />
 <slot />
