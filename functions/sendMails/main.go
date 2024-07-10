@@ -1,11 +1,15 @@
 package handler
 
 import (
-	"net/http"
+	"context"
+	"encoding/json"
+	"errors"
 	"os"
-	"time"
 
-	"github.com/apognu/gocal"
+	"github.com/Boostport/mjml-go"
+	"github.com/appwrite/sdk-for-go/client"
+	"github.com/appwrite/sdk-for-go/id"
+	"github.com/appwrite/sdk-for-go/messaging"
 	"github.com/open-runtimes/types-for-go/v4"
 )
 
@@ -14,33 +18,78 @@ func Main(Context *types.Context) types.ResponseOutput {
 		return Context.Res.Text("Not Found", 404, nil)
 	}
 
-	url := Context.Req.BodyText()
+	appwriteClient := client.NewClient()
+	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
+	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
+	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
 
-	if os.Getenv("APPWRITE_ENV") == "development" {
-		url = "https://calendar.google.com/calendar/ical/e251560319ad845251b578e5a88962f3c20cf07a6900a462f75cb42c7dc898ca%40group.calendar.google.com/private-67520c9a35acde3e6ab144529aa7f389/basic.ics"
+	appwriteMessaging := messaging.NewMessaging(appwriteClient)
+
+	subject := "MJML E-mail"
+	input := `
+	<mjml>
+	<mj-body>
+	  <mj-wrapper border="1px solid #EDEDF0" padding="50px 30px" background-color="#FAFAFB">
+		<mj-section>
+		  <mj-column>
+			<mj-text font-size="20px" color="#56565C" font-family="helvetica" padding-left="0px">
+			  July 9, 2024
+			</mj-text>
+			<mj-text font-size="30px" color="#19191C" font-family="helvetica" padding-left="0px">
+						  Upcoming Events
+			</mj-text>
+		  </mj-column>
+		</mj-section>
+
+		<mj-section>
+			<mj-column>
+				<mj-text font-size="50px" color="#56565C" font-family="helvetica">•</mj-text>
+			</mj-column>
+			<mj-column>
+				<mj-text font-size="12px" color="#2D2D31" font-family="helvetica" padding-top="0px">
+					Submit final project  adioadsno noiasd noisdaoin aonisadf oni asfdionafnd sioreport
+				</mj-text>
+			</mj-column>
+		</mj-section>
+		
+
+		<mj-section padding="5px 0">  </mj-section>
+	  </mj-wrapper>
+	</mj-body>
+  </mjml>
+	`
+
+	output, err := mjml.ToHTML(
+		context.Background(),
+		input,
+		mjml.WithValidationLevel(mjml.Strict),
+		mjml.WithBeautify(false),
+		mjml.WithMinify(true),
+		mjml.WithKeepComments(false),
+	)
+
+	var mjmlError mjml.Error
+	if errors.As(err, &mjmlError) {
+		errorAsJson, _ := json.Marshal(mjmlError)
+		Context.Error(string(errorAsJson[:]))
 	}
 
-	calResp, err := http.Get(url)
+	message, err := appwriteMessaging.CreateEmail(
+		id.Unique(),
+		subject,
+		output,
+		messaging.WithCreateEmailHtml(true),
+		messaging.WithCreateEmailUsers([]interface{}{
+			Context.Req.Headers["x-appwrite-user-id"],
+		}),
+	)
+
 	if err != nil {
 		Context.Error(err)
 		return Context.Res.Text("Error", 500, nil)
 	}
 
-	defer calResp.Body.Close()
-
-	start, end := time.Now(), time.Now().Add(12*30*24*time.Hour)
-
-	c := gocal.NewParser(calResp.Body)
-	c.Start, c.End = &start, &end
-	c.Parse()
-
-	Context.Log("Reading")
-
-	for _, e := range c.Events {
-		Context.Log(e.Summary)
-	}
-
-	Context.Log("End of it")
+	Context.Log("Message ID: " + message.Id)
 
 	return Context.Res.Text("OK", 200, nil)
 }

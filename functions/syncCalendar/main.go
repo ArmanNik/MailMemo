@@ -22,6 +22,7 @@ type EventMinimal struct {
 	Summary      string
 	Description  string
 	Start        *time.Time
+	End          *time.Time
 	LastModified *time.Time
 }
 
@@ -88,6 +89,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 			Summary:      e.Summary,
 			Description:  e.Description,
 			Start:        e.Start,
+			End:          e.End,
 			LastModified: e.LastModified,
 		}
 
@@ -230,7 +232,8 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 					"uid":         e.Uid,
 					"name":        e.Summary,
 					"description": e.Description,
-					"occurAt":     e.Start.Format(time.RFC3339),
+					"startAt":     e.Start.Format(time.RFC3339),
+					"endAt":       e.End.Format(time.RFC3339),
 					"modifiedAt":  e.LastModified.Format(time.RFC3339),
 				}, databases.WithCreateDocumentPermissions([]interface{}{
 					permission.Read(role.User(userId, "")),
@@ -258,7 +261,8 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 					_, err := appwriteDatabases.UpdateDocument("main", "events", existingEventDocument["$id"].(string), databases.WithUpdateDocumentData(map[string]interface{}{
 						"name":        e.Summary,
 						"description": e.Description,
-						"occurAt":     e.Start.Format(time.RFC3339),
+						"startAt":     e.Start.Format(time.RFC3339),
+						"endAt":       e.End.Format(time.RFC3339),
 						"modifiedAt":  e.LastModified.Format(time.RFC3339),
 					}))
 
