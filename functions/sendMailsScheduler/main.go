@@ -63,7 +63,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	cursor := "INIT"
 	for ok := true; ok; ok = (cursor != "") {
-		Context.Error("Page iteration")
+		Context.Log("Page iteration")
 
 		orQueries := []string{}
 		for _, currentDate := range currentDateStrings {
@@ -129,7 +129,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 		}
 	}
 
-	Context.Error("Done")
+	Context.Log("Done")
 
 	return Context.Res.Text("OK", 200, nil)
 }

@@ -20,7 +20,6 @@ import (
 type EventMinimal struct {
 	Uid          string
 	Summary      string
-	Description  string
 	Start        *time.Time
 	End          *time.Time
 	LastModified *time.Time
@@ -87,7 +86,6 @@ func Main(Context *types.Context) types.ResponseOutput {
 		eventChunk[i] = EventMinimal{
 			Uid:          e.Uid,
 			Summary:      e.Summary,
-			Description:  e.Description,
 			Start:        e.Start,
 			End:          e.End,
 			LastModified: e.LastModified,
@@ -108,17 +106,19 @@ func Main(Context *types.Context) types.ResponseOutput {
 		i++
 	}
 
-	err = processEventsChunk(Context, userId, calendarId, appwriteDatabases, eventChunk)
-	if err != nil {
-		Context.Error(err)
-		return Context.Res.Text("Error", 500, nil)
+	if len(eventChunk) > 0 {
+		err = processEventsChunk(Context, userId, calendarId, appwriteDatabases, eventChunk)
+		if err != nil {
+			Context.Error(err)
+			return Context.Res.Text("Error", 500, nil)
+		}
 	}
 
 	eventChunk = [100]EventMinimal{}
 
 	cursor := "INIT"
 	for ok := true; ok; ok = (cursor != "") {
-		Context.Error("Existing page iteration")
+		Context.Log("Existing page iteration")
 
 		var queries []interface{}
 
@@ -228,13 +228,12 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 				defer wg.Done()
 
 				_, err := appwriteDatabases.CreateDocument("main", "events", id.Unique(), map[string]interface{}{
-					"calendarId":  calendarId,
-					"uid":         e.Uid,
-					"name":        e.Summary,
-					"description": e.Description,
-					"startAt":     e.Start.Format(time.RFC3339),
-					"endAt":       e.End.Format(time.RFC3339),
-					"modifiedAt":  e.LastModified.Format(time.RFC3339),
+					"calendarId": calendarId,
+					"uid":        e.Uid,
+					"name":       e.Summary,
+					"startAt":    e.Start.Format(time.RFC3339),
+					"endAt":      e.End.Format(time.RFC3339),
+					"modifiedAt": e.LastModified.Format(time.RFC3339),
 				}, databases.WithCreateDocumentPermissions([]interface{}{
 					permission.Read(role.User(userId, "")),
 				}))
@@ -259,11 +258,10 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 					defer wg.Done()
 
 					_, err := appwriteDatabases.UpdateDocument("main", "events", existingEventDocument["$id"].(string), databases.WithUpdateDocumentData(map[string]interface{}{
-						"name":        e.Summary,
-						"description": e.Description,
-						"startAt":     e.Start.Format(time.RFC3339),
-						"endAt":       e.End.Format(time.RFC3339),
-						"modifiedAt":  e.LastModified.Format(time.RFC3339),
+						"name":       e.Summary,
+						"startAt":    e.Start.Format(time.RFC3339),
+						"endAt":      e.End.Format(time.RFC3339),
+						"modifiedAt": e.LastModified.Format(time.RFC3339),
 					}))
 
 					if err != nil {

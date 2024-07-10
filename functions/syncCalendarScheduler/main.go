@@ -32,7 +32,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	cursor := "INIT"
 	for ok := true; ok; ok = (cursor != "") {
-		Context.Error("Page iteration")
+		Context.Log("Page iteration")
 
 		var queries []interface{}
 
@@ -94,7 +94,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 			cursor = ""
 		}
 	}
-	Context.Error("Done")
+	Context.Log("Done")
 
 	return Context.Res.Text("OK", 200, nil)
 }
