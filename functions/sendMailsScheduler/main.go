@@ -1,37 +1,135 @@
 package handler
 
 import (
+	"os"
+	"strconv"
+	"sync"
+	"time"
+
+	"github.com/appwrite/sdk-for-go/client"
+	"github.com/appwrite/sdk-for-go/functions"
+	"github.com/appwrite/sdk-for-go/query"
+	"github.com/appwrite/sdk-for-go/users"
 	"github.com/open-runtimes/types-for-go/v4"
 )
 
-// This is your Appwrite function
-// It's executed each time we get a request
 func Main(Context *types.Context) types.ResponseOutput {
-	// Why not try the Appwrite SDK?
-	//
-	// appwriteClient := client.NewClient()
-	// appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
-	// appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
-	// appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
+	appwriteClient := client.NewClient()
+	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
+	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
+	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
 
-	// You can log messages to the console
-	Context.Log("Hello, Logs!")
+	appwriteUsers := users.NewUsers(appwriteClient)
+	appwriteFunctions := functions.NewFunctions(appwriteClient)
 
-	// If something goes wrong, log an error
-	Context.Error("Hello, Errors!")
+	hour, minute, _ := time.Now().Clock()
+	weekday := int(time.Now().Weekday())
+	_, _, monthday := time.Now().Date()
 
-	// The `Req` object contains the request data
-	if Context.Req.Method == "GET" {
-		// Send a text response with the res object helpers
-		// `Res.Text()` dispatches a string back to the client
-		return Context.Res.Text("Hello, World!", 200, nil)
+	format := "am"
+	if hour >= 12 {
+		hour -= 12
+		format = "pm"
 	}
 
-	// `Res.Json()` is a handy helper for sending JSON
-	return Context.Res.Json(map[string]interface{}{
-		"motto":       "Build like a team of hundreds_",
-		"learn":       "https://appwrite.io/docs",
-		"connect":     "https://appwrite.io/discord",
-		"getInspired": "https://builtwith.appwrite.io",
-	}, 200, nil)
+	today := time.Now()
+	endOfMonthDay := today.AddDate(0, 1, -today.Day()).Day()
+	beforeEndOfMonthDay := today.AddDate(0, 1, -today.Day()-1).Day()
+
+	monthlyVerbose := ""
+
+	if monthday == 7 {
+		monthlyVerbose = "day1"
+	} else if monthday == 14 {
+		monthlyVerbose = "day7"
+	} else if monthday == 21 {
+		monthlyVerbose = "day14"
+	} else if monthday == endOfMonthDay {
+		monthlyVerbose = "dayLast"
+	} else if monthday == beforeEndOfMonthDay {
+		monthlyVerbose = "dayBeforeLast"
+	}
+
+	currentDateStrings := []string{
+		strconv.Itoa(hour) + "T" + strconv.Itoa(minute) + "T" + format + "TdailyT",
+		strconv.Itoa(hour) + "T" + strconv.Itoa(minute) + "T" + format + "TweeklyT" + strconv.Itoa(weekday),
+	}
+
+	if monthlyVerbose != "" {
+		currentDateStrings = append(currentDateStrings, strconv.Itoa(hour)+"T"+strconv.Itoa(minute)+"T"+format+"TmonthlyT"+monthlyVerbose)
+	}
+
+	Context.Log(currentDateStrings)
+
+	cursor := "INIT"
+	for ok := true; ok; ok = (cursor != "") {
+		Context.Log("Page iteration")
+
+		orQueries := []string{}
+		for _, currentDate := range currentDateStrings {
+			orQueries = append(orQueries, query.Contains("labels", currentDate))
+		}
+
+		queries := []interface{}{
+			query.Limit(50),
+			query.Or(orQueries),
+		}
+
+		if cursor != "INIT" {
+			queries = append(queries, query.CursorAfter(cursor))
+		}
+
+		listResponse, listErr := appwriteUsers.List(users.WithListQueries(queries))
+		if listErr != nil {
+			Context.Error(listErr)
+			return Context.Res.Text("Error", 500, nil)
+		}
+
+		var wg sync.WaitGroup
+		wg.Add(len(listResponse.Users))
+		errCh := make(chan error, len(listResponse.Users))
+
+		for _, user := range listResponse.Users {
+			go func(u interface{}) {
+				defer wg.Done()
+
+				userStruct := u.(map[string]interface{})
+				userId := userStruct["$id"].(string)
+				userEmail := userStruct["email"].(string)
+
+				Context.Log("Sending mail to " + userId + ": " + userEmail)
+
+				_, err := appwriteFunctions.CreateExecution(
+					"sendMails",
+					functions.WithCreateExecutionAsync(true),
+					functions.WithCreateExecutionMethod("POST"),
+					functions.WithCreateExecutionBody(userId),
+				)
+				if err != nil {
+					errCh <- err
+				}
+			}(user)
+		}
+
+		wg.Wait()
+		close(errCh)
+
+		for err := range errCh {
+			Context.Error(err)
+			return Context.Res.Text("Error", 500, nil)
+		}
+
+		if len(listResponse.Users) > 0 {
+			lastDocument := listResponse.Users[len(listResponse.Users)-1].(map[string]interface{})
+
+			lastDocumentId := lastDocument["$id"].(string)
+			cursor = lastDocumentId
+		} else {
+			cursor = ""
+		}
+	}
+
+	Context.Log("Done")
+
+	return Context.Res.Text("OK", 200, nil)
 }

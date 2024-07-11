@@ -8,7 +8,7 @@
             "databases": true,
             "locale": false,
             "health": false,
-            "storage": false,
+            "storage": true,
             "teams": false,
             "users": true,
             "functions": true,
@@ -43,13 +43,17 @@
             "execute": [],
             "events": [],
             "schedule": "",
-            "timeout": 15,
+            "timeout": 60,
             "enabled": true,
             "logging": true,
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMails",
-            "scopes": []
+            "scopes": [
+                "messages.write",
+                "users.read",
+                "documents.read"
+            ]
         },
         {
             "$id": "syncCalendar",
@@ -66,14 +70,15 @@
             "path": "functions/syncCalendar",
             "scopes": [
                 "documents.read",
-                "documents.write"
+                "documents.write",
+                "users.read"
             ]
         },
         {
             "$id": "syncCalendarScheduler",
             "name": "syncCalendarScheduler",
             "runtime": "go-1.22",
-            "execute": [],
+            "execute": ["users"],
             "events": [],
             "schedule": "*/15 * * * *",
             "timeout": 900,
@@ -100,14 +105,21 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMailsScheduler",
-            "scopes": []
+            "scopes": [
+                "users.read",
+                "execution.write"
+            ]
         },
         {
             "$id": "api",
             "name": "api",
             "runtime": "go-1.22",
-            "execute": ["users"],
-            "scopes": ["users.write"],
+            "execute": [
+                "users"
+            ],
+            "scopes": [
+                "users.write"
+            ],
             "events": [],
             "schedule": "",
             "timeout": 15,
@@ -128,7 +140,9 @@
     "collections": [
         {
             "$id": "calendars",
-            "$permissions": [],
+            "$permissions": [
+                "create(\"users\")"
+            ],
             "databaseId": "main",
             "name": "calendars",
             "enabled": true,
@@ -186,14 +200,6 @@
                     "default": null
                 },
                 {
-                    "key": "description",
-                    "type": "string",
-                    "required": false,
-                    "array": false,
-                    "size": 2048,
-                    "default": null
-                },
-                {
                     "key": "name",
                     "type": "string",
                     "required": false,
@@ -214,6 +220,7 @@
                     "type": "datetime",
                     "required": true,
                     "array": false,
+                    "format": "",
                     "default": null
                 },
                 {
@@ -221,6 +228,7 @@
                     "type": "datetime",
                     "required": true,
                     "array": false,
+                    "format": "",
                     "default": null
                 },
                 {
@@ -228,10 +236,31 @@
                     "type": "datetime",
                     "required": true,
                     "array": false,
+                    "format": "",
                     "default": null
                 }
             ],
             "indexes": []
+        }
+    ],
+    "buckets": [
+        {
+            "$id": "email-assets",
+            "$permissions": [
+                "read(\"any\")"
+            ],
+            "fileSecurity": false,
+            "name": "Email assets",
+            "enabled": true,
+            "maximumFileSize": 5000000,
+            "allowedFileExtensions": [
+                "png",
+                "jpg",
+                "gif"
+            ],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
         }
     ]
 }
