@@ -30,6 +30,35 @@ Sample `4XX` or `5XX` Response:
 Error updating user labels
 ```
 
+
+### POST /v1/calendars
+
+- Sets user's label based on his onboarding prefferences.
+
+**Request**
+
+```json
+{
+  "url": "http://..../.../calendar.ics",
+  "name": "Test",
+  "color": "mint"
+}
+```
+
+**Response**
+
+Sample `200` Response:
+
+```text
+OK
+```
+
+Sample `4XX` or `5XX` Response:
+
+```text
+Calendar URL is not valid
+```
+
 ## ⚙️ Configuration
 
 | Setting           | Value         |

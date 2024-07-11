@@ -120,7 +120,8 @@
                 "users"
             ],
             "scopes": [
-                "users.write"
+                "users.write",
+                "documents.write"
             ],
             "events": [],
             "schedule": "",

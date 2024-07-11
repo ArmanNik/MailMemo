@@ -18,6 +18,8 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	if action == "PATCH /v1/scheduler/intervals" {
 		return services.UpdateSchedulerInterval(Context, appwriteClient)
+	} else if action == "POST /v1/calendars" {
+		return services.CreateCalendar(Context, appwriteClient)
 	}
 
 	return Context.Res.Text("Not Found", 404, nil)
