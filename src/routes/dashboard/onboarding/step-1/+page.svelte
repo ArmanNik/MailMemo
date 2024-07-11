@@ -4,12 +4,11 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { onMount } from 'svelte';
 	import { step } from '../store';
-	import { databases } from '$lib/sdk';
+	import { databases, functions } from '$lib/sdk';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
-	import { ID } from 'appwrite';
-	import { user } from '$lib/stores';
+	import { ExecutionMethod, ID } from 'appwrite';
 	import { CalColors, colorToHex } from '$lib/calendars';
 	import { toast } from 'svelte-sonner';
 
@@ -29,13 +28,27 @@
 		}
 		if (selectedProvider === 'url') {
 			try {
-				await databases.createDocument('main', 'calendars', ID.unique(), {
-					userId: $user?.$id,
-					name,
-					url,
-					color
-				});
-				await goto('/dashboard/onboarding/step-1');
+				const execution = await functions.createExecution(
+					'api',
+					JSON.stringify({
+						name,
+						url,
+						color
+					}),
+					false,
+					'/v1/scheduler/intervals',
+					ExecutionMethod.PATCH
+				);
+				const isOk = execution.responseStatusCode;
+
+				if (!isOk) {
+					toast(
+						execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
+					);
+					return;
+				} else {
+					await goto('/dashboard/onboarding/step-2');
+				}
 			} catch (error) {
 				console.log(error);
 				const message = (error as Error)?.message;
@@ -56,7 +69,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="mt-6 max-w-[80%] font-header text-3xl tracking-tight">
+	<h1 class="font-header mt-6 max-w-[80%] text-3xl tracking-tight">
 		Connect a calendar to get started
 	</h1>
 	<p class="mt-4 text-muted-foreground">

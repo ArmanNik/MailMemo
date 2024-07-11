@@ -5,7 +5,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import { toLocaleTimeISO } from '$lib/utils';
 	import EmptyCard from './emptyCard.svelte';
-	import type { CalEvent } from '$lib/calendars';
+	import { colorToHex, type CalEvent } from '$lib/calendars';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { functions } from '$lib/sdk';
 	import { ExecutionMethod } from 'appwrite';
@@ -141,7 +141,7 @@
 								<span class="flex items-center gap-2">
 									<span
 										class="h-2 w-2 rounded-full"
-										style={`background-color: ${calendar?.color}`}
+										style={`background-color: ${colorToHex(calendar?.color)}`}
 									/>
 									<p>{calendar?.name}</p>
 								</span>
@@ -186,7 +186,7 @@
 										<span class="flex items-center gap-2">
 											<span
 												class="h-2 w-2 rounded-full"
-												style={`background-color: ${calendar?.color}`}
+												style={`background-color: ${colorToHex(calendar?.color)}`}
 											/>
 											<p>{calendar?.name}</p>
 										</span>

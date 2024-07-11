@@ -10,7 +10,10 @@
 	onMount(async () => {
 		if ($user?.$id) {
 			const skippedRoutes = ['/login', '/register', '/recover'];
-			if (skippedRoutes.some((n) => $page.url.pathname.startsWith(n))) {
+			if (
+				skippedRoutes.some((n) => $page.url.pathname.startsWith(n)) ||
+				$page.url.pathname === '/'
+			) {
 				await goto('/dashboard');
 			}
 		}
