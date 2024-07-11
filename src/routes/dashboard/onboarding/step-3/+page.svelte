@@ -19,7 +19,7 @@
 		if (!form.checkValidity()) {
 			form.requestSubmit();
 		}
-		preferences.set({ period });
+		$preferences = { ...$preferences, period };
 		await goto('/dashboard/onboarding/step-4');
 
 		// try {
