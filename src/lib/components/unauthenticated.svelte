@@ -1,4 +1,4 @@
-<div class="mm-container flex h-full min-h-[100vh] w-full flex-col lg:grid lg:grid-cols-2">
+<div class="mm-container flex h-full min-h-[100vh] w-full flex-col px-8 lg:grid lg:grid-cols-2">
 	<div class="hidden bg-muted lg:block">
 		<img
 			src="/images/placeholder.svg"
@@ -8,7 +8,7 @@
 			class="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
 		/>
 	</div>
-	<div class="mt-8 block text-center lg:hidden">logo</div>
+	<div class="mt-8 block text-center lg:hidden"><img src="/logotype.svg" alt="" /></div>
 	<div class="flex h-full grow flex-col items-center justify-between py-8">
 		<div class="flex items-center justify-center py-12">
 			<div class="mx-auto grid w-[350px] gap-6">
