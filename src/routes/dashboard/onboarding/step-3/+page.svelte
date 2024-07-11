@@ -8,7 +8,7 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import { user } from '$lib/stores';
 
-	let period: 'today' | 'week' | 'month' | 'year' = 'today';
+	let period: 'today' | 'week' | 'month' | 'year' = 'year';
 	let form: HTMLFormElement;
 
 	onMount(() => {

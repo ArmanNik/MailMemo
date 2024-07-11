@@ -140,7 +140,7 @@
 	</p>
 </div>
 
-<div class="mt-auto flex justify-between">
-	<Button variant="outline" on:click={() => goto('/dashboard/onboarding/step-1')}>Back</Button>
+<div class="mt-auto flex justify-end">
+	<!-- <Button variant="outline" on:click={() => goto('/dashboard/onboarding/step-1')}>Back</Button> -->
 	<Button on:click={handleNext}>Next</Button>
 </div>
