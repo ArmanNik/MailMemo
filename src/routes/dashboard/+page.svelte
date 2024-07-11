@@ -154,7 +154,7 @@
 				</Badge>
 			{/each}
 		{/if}
-		<a href="/onboarding/step-1">
+		<a href="/dashboard/onboarding/step-1">
 			<Badge variant="outline">
 				+
 				<p class="ml-2">Add calendar</p>
