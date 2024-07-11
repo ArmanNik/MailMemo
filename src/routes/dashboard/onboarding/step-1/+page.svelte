@@ -56,7 +56,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="font-header mt-6 max-w-[80%] text-3xl tracking-tight">
+	<h1 class="mt-6 max-w-[80%] font-header text-3xl tracking-tight">
 		Connect a calendar to get started
 	</h1>
 	<p class="mt-4 text-muted-foreground">
@@ -123,7 +123,7 @@
 				<Input id="url" type="url" placeholder="Enter URL" required bind:value={url} />
 				<p class="text-sm text-muted-foreground">
 					You can find iCal address in sharing options in your calendar settings. <a
-						href="http://appwrite.io"
+						href="https://abalone-swing-bf0.notion.site/Instructions-to-get-iCal-link-07d2282244cb4760bdef8f8f0b1833f5"
 						target="_blank"
 						rel="noopener noreferrer"
 						class="underline">Learn more</a
