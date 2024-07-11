@@ -78,7 +78,9 @@
             "$id": "syncCalendarScheduler",
             "name": "syncCalendarScheduler",
             "runtime": "go-1.22",
-            "execute": ["users"],
+            "execute": [
+                "users"
+            ],
             "events": [],
             "schedule": "*/15 * * * *",
             "timeout": 900,

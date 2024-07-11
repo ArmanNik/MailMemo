@@ -404,7 +404,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 						<mj-column padding="0px">
 							<mj-text font-size="18px" font-weight="400" color="#EDEDF0" padding="0px">
 								Upcoming Events&nbsp;
-								<span style="background-color: #222224; font-size: 12px; border-radius:25px; padding: 5px 8px;">` + strconv.Itoa(totalUpcoming) + `</span>
+								<span style="background-color: #222224; font-size: 12px; border-radius:25px; padding: 5px 10px;">` + strconv.Itoa(totalUpcoming) + `</span>
 							</mj-text>
 						</mj-column>
 					</mj-section>
