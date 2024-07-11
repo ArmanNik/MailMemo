@@ -1,6 +1,6 @@
 import { Client, Account, Databases, Functions } from 'appwrite';
 
-const client = new Client();
+export const client = new Client();
 
 client.setEndpoint('https://v16.appwrite.org/v1').setProject('mail-memo');
 
