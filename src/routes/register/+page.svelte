@@ -12,8 +12,10 @@
 	let email = '';
 	let password = '';
 	let name = '';
+	let disabled = false;
 
 	async function handleSubmit() {
+		disabled = true;
 		try {
 			await account.create(ID.unique(), email, password, name);
 			await account.createEmailPasswordSession(email, password);

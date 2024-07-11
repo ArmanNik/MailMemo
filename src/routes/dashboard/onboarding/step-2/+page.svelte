@@ -31,9 +31,9 @@
 			const execution = await functions.createExecution(
 				'api',
 				JSON.stringify({
-					cestHour,
-					cestMinute,
-					format,
+					hours: cestHour,
+					minutes: cestMinute,
+					format: format.toLowerCase(),
 					timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
 				}),
 				false,
@@ -86,7 +86,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="font-header mt-6 max-w-[80%] text-3xl tracking-tight">
+	<h1 class="mt-6 max-w-[80%] font-header text-3xl tracking-tight">
 		Select the time to receive reminders
 	</h1>
 	<p class="mt-4 text-muted-foreground">
