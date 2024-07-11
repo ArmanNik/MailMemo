@@ -7,6 +7,8 @@
 	import EmptyCard from './emptyCard.svelte';
 	import type { CalEvent } from '$lib/calendars';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { functions } from '$lib/sdk';
+	import { ExecutionMethod } from 'appwrite';
 
 	export let data;
 
@@ -26,6 +28,43 @@
 			}
 		}
 	}
+
+	async function syncCalendars() {
+		const execution = await functions.createExecution(
+			'syncCalendarScheduler',
+			'',
+			false,
+			'/v1/scheduler/intervals',
+			ExecutionMethod.POST
+		);
+		const isOk = execution.responseStatusCode;
+
+		if (!isOk) {
+			alert(
+				execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
+			);
+			return;
+		}
+	}
+
+	async function sendEmail() {
+		const execution = await functions.createExecution(
+			'sendEmail',
+			'',
+			false,
+			'/v1/scheduler/intervals',
+			ExecutionMethod.POST
+		);
+		const isOk = execution.responseStatusCode;
+
+		if (!isOk) {
+			alert(
+				execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
+			);
+			return;
+		}
+	}
+
 	$: todayEvents = data?.events?.documents?.filter((event) => {
 		const eventDate = new Date(event.startAt);
 		const today = new Date();
@@ -48,8 +87,6 @@
 		acc[days].push(event as CalEvent);
 		return acc;
 	}, {});
-
-	$: console.log(futureEvents, futureEventsGrouped, Object.entries(futureEventsGrouped));
 </script>
 
 <svelte:head>
@@ -57,14 +94,16 @@
 </svelte:head>
 
 <div class="mt-12 h-full w-full max-w-[750px] pb-16 lg:pb-0">
-	<div class="flex w-full items-center justify-between">
+	<div class="flex w-full justify-between">
 		<div class="flex flex-col">
 			<p class="font-header text-xl">Hello</p>
 			<h3 class="font-header text-2xl">
 				{$user?.name}
 			</h3>
 		</div>
-		<a href="#">icon</a>
+		<a href="/dashboard/settings" aria-label="settings">
+			<img src="/icons/cog.svg" alt="settings" />
+		</a>
 	</div>
 	<div class="mt-3 flex gap-2">
 		{#if data?.calendars?.total}
@@ -161,6 +200,7 @@
 <div
 	class="fixed bottom-0 flex w-full max-w-[750px] justify-between gap-4 px-5 py-8 lg:relative lg:px-0"
 >
-	<Button variant="outline" class="w-full lg:w-auto">Sync calendars</Button>
-	<Button class="w-full lg:w-auto">Send Email</Button>
+	<Button variant="outline" class="w-full lg:w-auto" on:click={syncCalendars}>Sync calendars</Button
+	>
+	<Button class="w-full lg:w-auto" on:click={sendEmail}>Send Email</Button>
 </div>
