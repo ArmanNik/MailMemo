@@ -30,6 +30,26 @@
 		}
 	}
 
+	function evaluateCornerRadiusFuture(index: number, groupedByDay: [string, CalEvent[]][]) {
+		let classes = '';
+
+		const previousGroup = groupedByDay?.[index - 1];
+		const currentGroup = groupedByDay[index];
+		const nextGroup = groupedByDay?.[index + 1];
+		if (!previousGroup) {
+			classes += ' rounded-t-xl';
+		} else if (parseInt(currentGroup[0]) === parseInt(previousGroup[0]) + 1) {
+			classes += ' rounded-t-none';
+		}
+		if (!nextGroup) {
+			classes += ' rounded-b-xl';
+		} else if (parseInt(currentGroup[0]) === parseInt(nextGroup[0]) - 1) {
+			classes += ' rounded-b-none';
+		}
+
+		return classes;
+	}
+
 	async function syncCalendars() {
 		const execution = await functions.createExecution(
 			'syncCalendarScheduler',
@@ -77,6 +97,7 @@
 		const today = new Date();
 		return eventDate.getDate() > today.getDate();
 	});
+
 	//Group events that are in the same day. Use the number of days from today as the key
 	$: futureEventsGrouped = futureEvents?.reduce((acc: Record<string, CalEvent[]>, event) => {
 		const eventDate = new Date(event.startAt);
@@ -162,7 +183,7 @@
 		{#if futureEvents?.length}
 			{@const groupedByDay = Object.entries(futureEventsGrouped)}
 			{#each groupedByDay as group, groupIndex}
-				<Card.Root class={`frosted ${evaluateCornerRadius(groupIndex, groupedByDay?.length)}`}>
+				<Card.Root class={`frosted ${evaluateCornerRadiusFuture(groupIndex, groupedByDay)}`}>
 					<Card.Header class="p-4">
 						<span class="mb-2">
 							<Badge>
