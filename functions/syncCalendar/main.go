@@ -14,6 +14,7 @@ import (
 	"github.com/appwrite/sdk-for-go/permission"
 	"github.com/appwrite/sdk-for-go/query"
 	"github.com/appwrite/sdk-for-go/role"
+	"github.com/appwrite/sdk-for-go/users"
 	"github.com/open-runtimes/types-for-go/v4"
 )
 
@@ -35,6 +36,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
 	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
 
+	appwriteUsers := users.NewUsers(appwriteClient)
 	appwriteDatabases := databases.NewDatabases(appwriteClient)
 
 	calendarId := Context.Req.BodyText()
@@ -63,6 +65,21 @@ func Main(Context *types.Context) types.ResponseOutput {
 	calendarUrl := calendarDocument["url"].(string)
 	userId := calendarDocument["userId"].(string)
 
+	userStruct, userStructErr := appwriteUsers.Get(userId)
+	if userStructErr != nil {
+		Context.Error(userStructErr)
+		return Context.Res.Text("Error", 500, nil)
+	}
+	userPrefs := userStruct.Prefs.(map[string]interface{})
+	timezoneString := userPrefs["timezone"].(string)
+	userTimezone, timezoneErr := time.LoadLocation(timezoneString)
+
+	if timezoneErr != nil {
+		Context.Error(timezoneErr)
+		return Context.Res.Text("Error", 500, nil)
+
+	}
+
 	calResp, err := http.Get(calendarUrl)
 	if err != nil {
 		Context.Error(err)
@@ -71,7 +88,12 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	defer calResp.Body.Close()
 
-	start, end := time.Now(), time.Now().Add(12*30*24*time.Hour)
+	start := time.Now().In(userTimezone)
+	start = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, start.Location())
+
+	end := time.Now().In(userTimezone)
+	end = time.Date(end.Year(), end.Month(), end.Day(), 0, 0, 0, 0, end.Location())
+	end = end.Add(12 * 30 * 24 * time.Hour)
 
 	c := gocal.NewParser(calResp.Body)
 	c.Start, c.End = &start, &end
@@ -180,7 +202,6 @@ func Main(Context *types.Context) types.ResponseOutput {
 }
 
 func processEventsChunk(Context *types.Context, userId string, calendarId string, appwriteDatabases *databases.Databases, events [100]EventMinimal) error {
-	// TODO: Figure out how to remove deleted event
 	eventIds := []interface{}{}
 
 	for _, event := range events {

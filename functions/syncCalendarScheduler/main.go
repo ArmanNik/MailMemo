@@ -30,23 +30,26 @@ func Main(Context *types.Context) types.ResponseOutput {
 	appwriteDatabases := databases.NewDatabases(appwriteClient)
 	appwriteFunctions := functions.NewFunctions(appwriteClient)
 
+	userId := Context.Req.Headers["x-appwrite-user-id"]
+	if userId == "" {
+		userId = Context.Req.BodyText()
+	}
+
 	cursor := "INIT"
 	for ok := true; ok; ok = (cursor != "") {
 		Context.Log("Page iteration")
 
-		var queries []interface{}
+		queries := []interface{}{
+			query.Limit(50),
+			query.Select([]interface{}{"$id"}),
+		}
 
-		if cursor == "INIT" {
-			queries = []interface{}{
-				query.Select([]interface{}{"$id"}),
-				query.Limit(50),
-			}
-		} else {
-			queries = []interface{}{
-				query.Select([]interface{}{"$id"}),
-				query.Limit(50),
-				query.CursorAfter(cursor),
-			}
+		if cursor != "INIT" {
+			queries = append(queries, query.CursorAfter(cursor))
+		}
+
+		if userId != "" {
+			queries = append(queries, query.Equal("userId", userId))
 		}
 
 		listResponse, listErr := appwriteDatabases.ListDocuments("main", "calendars", databases.WithListDocumentsQueries(queries))

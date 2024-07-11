@@ -43,7 +43,7 @@
             "execute": [],
             "events": [],
             "schedule": "",
-            "timeout": 15,
+            "timeout": 60,
             "enabled": true,
             "logging": true,
             "entrypoint": "main.go",
@@ -70,14 +70,15 @@
             "path": "functions/syncCalendar",
             "scopes": [
                 "documents.read",
-                "documents.write"
+                "documents.write",
+                "users.read"
             ]
         },
         {
             "$id": "syncCalendarScheduler",
             "name": "syncCalendarScheduler",
             "runtime": "go-1.22",
-            "execute": [],
+            "execute": ["users"],
             "events": [],
             "schedule": "*/15 * * * *",
             "timeout": 900,
