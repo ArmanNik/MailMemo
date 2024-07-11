@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/apognu/gocal"
 	"github.com/appwrite/sdk-for-go/client"
 	"github.com/appwrite/sdk-for-go/databases"
 	"github.com/appwrite/sdk-for-go/id"
@@ -36,10 +38,24 @@ func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.
 		return Context.Res.Text("Color must be 'pink' or 'orange' or 'blue' or 'yellow' or 'purple'", 400, nil)
 	}
 
-	_, err = http.Get(body.Url)
+	calResp, err := http.Get(body.Url)
 	if err != nil {
 		Context.Error(err)
 		return Context.Res.Text("Calendar URL is not valid", 400, nil)
+	}
+
+	defer calResp.Body.Close()
+
+	start := time.Now()
+	end := time.Now().AddDate(0, 0, 1)
+
+	c := gocal.NewParser(calResp.Body)
+	c.Start = &start
+	c.End = &end
+	parseErr := c.Parse()
+	if parseErr != nil {
+		Context.Error(parseErr)
+		return Context.Res.Text("URL is not a valid calendar", 400, nil)
 	}
 
 	// Ensure it's user-executed
