@@ -54,7 +54,7 @@
 </script>
 
 <svelte:head>
-	<title>Onboarding (step 4) - MailMemo</title>
+	<title>Onboarding: set frequency - MailMemo</title>
 </svelte:head>
 
 <div>

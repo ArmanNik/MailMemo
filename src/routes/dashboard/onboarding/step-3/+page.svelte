@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>Onboarding (step 3) - MailMemo</title>
+	<title>Onboarding: set period - MailMemo</title>
 </svelte:head>
 
 <div>

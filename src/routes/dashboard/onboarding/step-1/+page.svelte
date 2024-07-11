@@ -4,13 +4,14 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { onMount } from 'svelte';
 	import { step } from '../store';
-	import { databases, functions } from '$lib/sdk';
+	import { account, databases, functions } from '$lib/sdk';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
 	import { ExecutionMethod, ID } from 'appwrite';
 	import { CalColors, colorToHex } from '$lib/calendars';
 	import { toast } from 'svelte-sonner';
+	import { user } from '$lib/stores';
 
 	let selectedProvider: 'google' | 'apple' | 'outlook' | 'url' | null = null;
 	let name = '';
@@ -48,6 +49,10 @@
 					);
 					return;
 				} else {
+					await account.updatePrefs({
+						...$user.prefs,
+						firstCal: true
+					});
 					await goto('/dashboard/onboarding/step-2');
 				}
 			} catch (error) {
@@ -66,7 +71,7 @@
 </script>
 
 <svelte:head>
-	<title>Onboarding (step 1) - MailMemo</title>
+	<title>Onboarding: Add a calendar - MailMemo</title>
 </svelte:head>
 
 <div>

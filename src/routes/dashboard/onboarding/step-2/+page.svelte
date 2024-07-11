@@ -81,7 +81,7 @@
 </script>
 
 <svelte:head>
-	<title>Onboarding (step 2) - MailMemo</title>
+	<title>Onboarding: select time - MailMemo</title>
 </svelte:head>
 
 <div>

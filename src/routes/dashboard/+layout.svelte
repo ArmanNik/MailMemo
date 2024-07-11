@@ -9,7 +9,11 @@
 
 	onMount(() => {
 		if (!$user?.prefs?.onboarded && !$page.url.pathname.includes('/onboarding')) {
-			goto('/dashboard/onboarding/step-1');
+			if ($user?.prefs?.firstCal) {
+				goto('/dashboard/onboarding/step-2');
+			} else {
+				goto('/dashboard/onboarding/step-1');
+			}
 			return;
 		}
 		let previousStatus: string | null = null;
