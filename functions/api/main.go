@@ -20,6 +20,8 @@ func Main(Context *types.Context) types.ResponseOutput {
 		return services.UpdateSchedulerInterval(Context, appwriteClient)
 	case "POST /v1/calendars":
 		return services.CreateCalendar(Context, appwriteClient)
+	case "DELETE /v1/subscriptions":
+		return services.DeleteSubscription(Context, appwriteClient)
 	default:
 		return Context.Res.Text("Not Found", 404, nil)
 	}

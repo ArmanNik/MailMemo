@@ -121,7 +121,8 @@
             ],
             "scopes": [
                 "users.write",
-                "documents.write"
+                "documents.write",
+                "users.read"
             ],
             "events": [],
             "schedule": "",
