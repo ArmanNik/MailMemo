@@ -8,7 +8,7 @@
             "databases": true,
             "locale": false,
             "health": false,
-            "storage": false,
+            "storage": true,
             "teams": false,
             "users": true,
             "functions": true,
@@ -49,7 +49,11 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMails",
-            "scopes": ["messages.write", "users.read", "documents.read"]
+            "scopes": [
+                "messages.write",
+                "users.read",
+                "documents.read"
+            ]
         },
         {
             "$id": "syncCalendar",
@@ -100,7 +104,10 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMailsScheduler",
-            "scopes": ["users.read", "execution.write"]
+            "scopes": [
+                "users.read",
+                "execution.write"
+            ]
         },
         {
             "$id": "api",
@@ -212,6 +219,7 @@
                     "type": "datetime",
                     "required": true,
                     "array": false,
+                    "format": "",
                     "default": null
                 },
                 {
@@ -219,6 +227,7 @@
                     "type": "datetime",
                     "required": true,
                     "array": false,
+                    "format": "",
                     "default": null
                 },
                 {
@@ -226,10 +235,31 @@
                     "type": "datetime",
                     "required": true,
                     "array": false,
+                    "format": "",
                     "default": null
                 }
             ],
             "indexes": []
+        }
+    ],
+    "buckets": [
+        {
+            "$id": "email-assets",
+            "$permissions": [
+                "read(\"any\")"
+            ],
+            "fileSecurity": false,
+            "name": "Email assets",
+            "enabled": true,
+            "maximumFileSize": 5000000,
+            "allowedFileExtensions": [
+                "png",
+                "jpg",
+                "gif"
+            ],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
         }
     ]
 }
