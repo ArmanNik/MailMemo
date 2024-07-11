@@ -97,6 +97,7 @@
 				);
 				return;
 			}
+			toast('Emails sent successfully 🚀');
 		} catch (error) {
 			toast(error as string);
 		} finally {
@@ -250,7 +251,7 @@
 </div>
 
 <div
-	class="fixed bottom-0 flex w-full max-w-[750px] justify-between gap-4 px-5 py-8 lg:relative lg:px-0"
+	class=" mm-backdrop fixed bottom-0 flex w-full max-w-[750px] justify-between gap-4 px-5 py-8 lg:relative lg:px-0"
 >
 	<Button
 		variant="outline"
@@ -265,3 +266,12 @@
 		<span class="ml-2"> Send email </span>
 	</Button>
 </div>
+
+<style>
+	.mm-backdrop {
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0) 10%, black 100%);
+		@media (min-width: 1024px) {
+			background: transparent;
+		}
+	}
+</style>
