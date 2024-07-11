@@ -327,8 +327,6 @@ func Main(Context *types.Context) types.ResponseOutput {
 			_, hasPreviousDay := mailData.Upcomming[previousDayKey]
 			_, hasNextDay := mailData.Upcomming[nextDayKey]
 
-			Context.Log(dayKey + "|" + previousDayKey + "|" + nextDayKey + "|" + strconv.FormatBool(hasPreviousDay) + "|" + strconv.FormatBool(hasNextDay))
-
 			if hasPreviousDay && hasNextDay {
 				borderRadius = "0px 0px 0px 0px"
 			} else if hasPreviousDay {
