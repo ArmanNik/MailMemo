@@ -4,11 +4,11 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { onMount } from 'svelte';
 	import { step } from '../store';
-	import { account, databases, functions } from '$lib/sdk';
+	import { account, functions } from '$lib/sdk';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
-	import { ExecutionMethod, ID } from 'appwrite';
+	import { ExecutionMethod } from 'appwrite';
 	import { CalColors, colorToHex } from '$lib/calendars';
 	import { toast } from 'svelte-sonner';
 	import { user } from '$lib/stores';

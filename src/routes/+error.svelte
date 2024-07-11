@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
-	onMount(() => {
-		console.log('test');
+	onMount(async () => {
+		if ($page?.status === 404) {
+			await goto('/dashboard');
+		}
 	});
 </script>
 
