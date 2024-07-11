@@ -1,38 +1,14 @@
-# create-svelte
+# MailMemo
+## Description
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+MailMemo consolidates events from all your calendars in one place and sends personalized email reminders at your preferred time of day, frequency of reminders, and time range of events to cover.
 
-## Creating a project
+This has several benefits:
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Connecting all of your calendars
+- Selecting when to receive reminders
+- Receiving a consolidated, organized update directly in your email inbox
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## Learn how we built it
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+You can learn how we built the project by [reading our blog](https://apwr.dev/mailmemo-blog).
