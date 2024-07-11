@@ -88,7 +88,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	userPrefs := userStruct.Prefs.(map[string]interface{})
 	timezoneString := userPrefs["timezone"].(string)
 	periodString := userPrefs["period"].(string)
-	isUnsubscribed := userPrefs["unsubscribed"].(bool)
+	isUnsubscribed, _ := userPrefs["unsubscribed"].(bool)
 	userTimezone, timezoneErr := time.LoadLocation(timezoneString)
 
 	if isUnsubscribed {
@@ -309,6 +309,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 			}
 
 			DayEventsHtml := strings.Join(DayEventsHtmlElements[:], `
+				<mj-divider border-width="16px" padding="0px 0px 0px 0px" border-color="#141416" />
 				<mj-divider border-width="1px" padding="0px 0px 0px 0px" border-color="#222224" />
 				<mj-divider border-width="16px" padding="0px 0px 0px 0px" border-color="#141416" />
 			`)
