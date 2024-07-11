@@ -41,7 +41,7 @@
 						color
 					}),
 					false,
-					'v1/calendars',
+					'/v1/calendars',
 					ExecutionMethod.POST
 				);
 				const isOk = execution.responseStatusCode === 200;
