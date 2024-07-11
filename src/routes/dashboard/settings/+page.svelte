@@ -26,13 +26,18 @@
 			</h3>
 		</div>
 	</div>
-	<img
-		src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXB1c25iZTU3cTJjYWZvdjdldWRyOWt3ZTJ0cGQ2Mm8xZm5lZzRpbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/B9TcUZLrpj9KFD5cLw/giphy.webp"
-		alt=""
-	/>
-	<a href="/dashboard" class="mt-2 underline">Go back</a>
+	<div class="mt-6 w-full rounded-lg object-contain shadow-lg">
+		<img
+			class="h-full w-full rounded-lg object-cover"
+			src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXB1c25iZTU3cTJjYWZvdjdldWRyOWt3ZTJ0cGQ2Mm8xZm5lZzRpbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/B9TcUZLrpj9KFD5cLw/giphy.webp"
+			alt=""
+		/>
+	</div>
 </div>
 
-<div class="flex w-full justify-end">
+<div class="flex w-full max-w-[750px] justify-between">
+	<Button variant="outline">
+		<a href="/dashboard"> Go back </a>
+	</Button>
 	<Button on:click={logout}>Logout</Button>
 </div>
