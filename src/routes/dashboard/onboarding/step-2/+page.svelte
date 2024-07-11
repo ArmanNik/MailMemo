@@ -29,7 +29,12 @@
 
 			const execution = await functions.createExecution(
 				'api',
-				JSON.stringify({ cestHour, cestMinute, format }),
+				JSON.stringify({
+					cestHour,
+					cestMinute,
+					format,
+					timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+				}),
 				false,
 				'/v1/scheduler/intervals',
 				ExecutionMethod.PATCH

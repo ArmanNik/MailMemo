@@ -65,3 +65,35 @@
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(20px);
 }
+
+.mm-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mm-container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 80%;
+  width: 100%;
+  height: 80%;
+  transform: translateY(-50%);
+  border-radius: 588px;
+  opacity: 0.3;
+  background: radial-gradient(49.55% 43.54% at 47% 50.69%, #cbc2ff 32%, #7c67fe 100%);
+  filter: blur(150px);
+}
+
+.mm-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-radius: 588px;
+  opacity: 0.3;
+  background: radial-gradient(49.55% 43.54% at 47% 50.69%, #cbc2ff 32%, #7c67fe 100%);
+  filter: blur(150px);
+}
