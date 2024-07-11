@@ -3,7 +3,6 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { onMount } from 'svelte';
-	import { step } from '../store';
 	import { account, databases, functions } from '$lib/sdk';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
@@ -18,10 +17,6 @@
 	let url = '';
 	let color = 'pink';
 	let form: HTMLFormElement;
-
-	onMount(() => {
-		step.set(1);
-	});
 
 	async function handleNext() {
 		if (!form.checkValidity()) {
@@ -38,8 +33,8 @@
 						color
 					}),
 					false,
-					'v1/calendars',
-					ExecutionMethod.POST
+					'/v1/scheduler/intervals',
+					ExecutionMethod.PATCH
 				);
 				const isOk = execution.responseStatusCode;
 
