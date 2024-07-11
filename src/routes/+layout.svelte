@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { user } from '$lib/stores';
 	import { page } from '$app/stores';
+	import { Toaster } from '$lib/components/ui/sonner';
 
 	onMount(async () => {
 		if ($user?.$id) {
@@ -17,4 +18,6 @@
 </script>
 
 <ModeWatcher defaultMode="dark" />
+<Toaster position="top-right" />
+
 <slot />

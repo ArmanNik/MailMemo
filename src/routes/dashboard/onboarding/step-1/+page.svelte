@@ -11,6 +11,7 @@
 	import { ID } from 'appwrite';
 	import { user } from '$lib/stores';
 	import { CalColors, colorToHex } from '$lib/calendars';
+	import { toast } from 'svelte-sonner';
 
 	let selectedProvider: 'google' | 'apple' | 'outlook' | 'url' | null = null;
 	let name = '';
@@ -37,6 +38,8 @@
 				await goto('/dashboard/onboarding/step-1');
 			} catch (error) {
 				console.log(error);
+				const message = (error as Error)?.message;
+				toast(message);
 			}
 		}
 	}

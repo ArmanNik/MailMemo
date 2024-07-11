@@ -8,6 +8,7 @@
 	import { goto } from '$app/navigation';
 	import { functions } from '$lib/sdk';
 	import { ExecutionMethod } from 'appwrite';
+	import { toast } from 'svelte-sonner';
 
 	let hour: string;
 	let minute: string;
@@ -42,7 +43,7 @@
 			const isOk = execution.responseStatusCode;
 
 			if (!isOk) {
-				alert(
+				toast(
 					execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
 				);
 				return;

@@ -9,6 +9,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { functions } from '$lib/sdk';
 	import { ExecutionMethod } from 'appwrite';
+	import { toast } from 'svelte-sonner';
 
 	export let data;
 
@@ -113,10 +114,12 @@
 					<p class="ml-2">{calendar.name}</p>
 				</Badge>
 			{/each}
-			<Badge variant="outline">
-				+
-				<p class="ml-2">Add calendar</p>
-			</Badge>
+			<button type="button" on:click={() => toast('test')}>
+				<Badge variant="outline">
+					+
+					<p class="ml-2">Add calendar</p>
+				</Badge>
+			</button>
 		{/if}
 	</div>
 	<Separator class="mt-5" />
