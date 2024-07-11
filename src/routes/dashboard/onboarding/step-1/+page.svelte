@@ -53,7 +53,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="mt-6 text-3xl font-bold">Connect a calendar to get started</h1>
+	<h1 class="font-header mt-6 text-3xl">Connect a calendar to get started</h1>
 	<p class="mt-4 text-balance text-muted-foreground">
 		Link your preferred calendar to seamlessly manage all your important events and reminders.
 	</p>

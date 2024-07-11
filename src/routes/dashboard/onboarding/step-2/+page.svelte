@@ -78,7 +78,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="mt-6 text-3xl font-bold">Select the time to receive reminders</h1>
+	<h1 class="font-header mt-6 text-3xl">Select the time to receive reminders</h1>
 	<p class="mt-4 text-balance text-muted-foreground">
 		Pick the best time of day for us to send you email reminder about your upcoming events.
 	</p>

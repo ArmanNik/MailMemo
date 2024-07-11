@@ -36,7 +36,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="mt-6 text-3xl font-bold">Set period for event reminders</h1>
+	<h1 class="font-header mt-6 text-3xl">Set period for event reminders</h1>
 	<p class="mt-4 text-balance text-muted-foreground">
 		Decide how far in advance you'd like to be reminded of your events.
 	</p>

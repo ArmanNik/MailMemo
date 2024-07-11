@@ -59,8 +59,8 @@
 <div class="mt-12 h-full w-full max-w-[750px] pb-16 lg:pb-0">
 	<div class="flex w-full items-center justify-between">
 		<div class="flex flex-col">
-			<p class="text-xl">Hello</p>
-			<h3 class="text-2xl font-bold">
+			<p class="font-header text-xl">Hello</p>
+			<h3 class="font-header text-2xl">
 				{$user?.name}
 			</h3>
 		</div>
@@ -81,7 +81,7 @@
 		{/if}
 	</div>
 	<Separator class="mt-5" />
-	<h1 class="mt-6 text-xl">Today</h1>
+	<h1 class="font-header mt-6 text-xl">Today</h1>
 
 	<div class="mt-4 grid gap-2">
 		{#if todayEvents?.length}
@@ -114,7 +114,7 @@
 			<EmptyCard />
 		{/if}
 	</div>
-	<h1 class="mt-8 text-xl">Upcoming Events</h1>
+	<h1 class="font-header mt-8 text-xl">Upcoming Events</h1>
 
 	<div class="mt-4 grid gap-2">
 		{#if futureEvents?.length}

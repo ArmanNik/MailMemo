@@ -58,7 +58,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="mt-6 text-3xl font-bold">Set the frequency of receiving reminders</h1>
+	<h1 class="font-header mt-6 text-3xl">Set the frequency of receiving reminders</h1>
 	<p class="mt-4 text-balance text-muted-foreground">
 		Decide how often you want to receive email reminders.
 	</p>
