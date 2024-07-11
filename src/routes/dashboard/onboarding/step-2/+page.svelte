@@ -23,12 +23,13 @@
 		if (!form.checkValidity()) {
 			form.requestSubmit();
 		}
-		preferences.set({
+		$preferences = {
+			...$preferences,
 			hour,
 			minute,
 			format,
 			timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-		});
+		};
 		await goto('/dashboard/onboarding/step-3');
 	}
 

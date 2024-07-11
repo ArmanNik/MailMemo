@@ -42,7 +42,6 @@
 			form.requestSubmit();
 		}
 		try {
-			console.log($preferences);
 			await account.updatePrefs({
 				...$user.prefs,
 				...$preferences,

@@ -56,6 +56,19 @@
 						...$user.prefs,
 						firstCal: true
 					});
+					const ex = await functions.createExecution(
+						'syncCalendarScheduler',
+						'',
+						false,
+						'/v1/scheduler/intervals',
+						ExecutionMethod.POST
+					);
+					const isOk = ex.responseStatusCode;
+
+					if (!isOk) {
+						toast(ex.responseBody ? ex.responseBody : 'Unexpected error. Please try again.');
+						return;
+					}
 					if ($user?.prefs?.onboarded) {
 						await goto('/dashboard');
 					} else {
@@ -84,7 +97,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="font-header mt-6 max-w-[80%] text-3xl tracking-tight">
+	<h1 class="mt-6 max-w-[80%] font-header text-3xl tracking-tight">
 		Connect a calendar to get started
 	</h1>
 	<p class="mt-4 text-muted-foreground">
