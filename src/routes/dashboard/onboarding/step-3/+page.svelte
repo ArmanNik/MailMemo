@@ -4,9 +4,7 @@
 	import { preferences, step } from '../store';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
-	import { account } from '$lib/sdk';
 	import * as RadioGroup from '$lib/components/ui/radio-group';
-	import { user } from '$lib/stores';
 
 	let period: 'today' | 'week' | 'month' | 'year' = 'year';
 	let form: HTMLFormElement;
@@ -21,15 +19,6 @@
 		}
 		$preferences = { ...$preferences, period };
 		await goto('/dashboard/onboarding/step-4');
-
-		// try {
-		// 	await account.updatePrefs({
-		// 		...$user.prefs,
-		// 		period
-		// 	});
-		// } catch (error) {
-		// 	console.log(error);
-		// }
 	}
 </script>
 

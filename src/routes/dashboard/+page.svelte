@@ -165,7 +165,7 @@
 		</a>
 	</div>
 	<Separator class="mt-5" />
-	<h1 class="font-header mt-6 text-xl">Today</h1>
+	<h1 class="mt-6 font-header text-xl">Today</h1>
 
 	<div class="mt-4 grid gap-2">
 		{#if todayEvents?.length}
@@ -198,7 +198,7 @@
 			<EmptyCard />
 		{/if}
 	</div>
-	<h1 class="font-header mt-8 text-xl">Upcoming Events</h1>
+	<h1 class="mt-8 font-header text-xl">Upcoming Events</h1>
 
 	<div class="mt-4 grid gap-2">
 		{#if futureEvents?.length}
@@ -235,7 +235,7 @@
 									</div>
 								</Card.Description>
 
-								<p class="font-header mt-2 text-lg leading-4">
+								<p class="mt-2 font-header text-lg leading-4">
 									{event.name}
 								</p>
 							{/each}
@@ -260,8 +260,8 @@
 	>
 	<Button class="w-full lg:w-auto" on:click={sendEmail} disabled={sendEmailButtonDisabled}>
 		{#if sendEmailButtonDisabled}
-			<LoaderCircle class="h-6 w-6" />
+			<LoaderCircle class="h-6 w-6 animate-spin" />
 		{/if}
-		Send email
+		<span class="ml-2"> Send email </span>
 	</Button>
 </div>

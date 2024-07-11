@@ -6,9 +6,6 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
-	import { functions } from '$lib/sdk';
-	import { ExecutionMethod } from 'appwrite';
-	import { toast } from 'svelte-sonner';
 
 	let hour: string = '09';
 	let minute: string = '00';
