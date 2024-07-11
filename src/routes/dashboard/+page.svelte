@@ -154,12 +154,12 @@
 				</Badge>
 			{/each}
 		{/if}
-		<button type="button" on:click={() => toast('test')}>
+		<a href="/onboarding/step-1">
 			<Badge variant="outline">
 				+
 				<p class="ml-2">Add calendar</p>
 			</Badge>
-		</button>
+		</a>
 	</div>
 	<Separator class="mt-5" />
 	<h1 class="font-header mt-6 text-xl">Today</h1>

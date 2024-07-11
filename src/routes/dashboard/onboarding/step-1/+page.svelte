@@ -53,7 +53,11 @@
 						...$user.prefs,
 						firstCal: true
 					});
-					await goto('/dashboard/onboarding/step-2');
+					if ($user?.prefs?.onboarded) {
+						await goto('/dashboard/dashboard');
+					} else {
+						await goto('/dashboard/onboarding/step-2');
+					}
 				}
 			} catch (error) {
 				console.log(error);
