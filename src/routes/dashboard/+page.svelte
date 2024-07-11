@@ -55,7 +55,7 @@
 	<title>Dashboard - MailMemo</title>
 </svelte:head>
 
-<div class=" mt-12 h-full w-full">
+<div class=" mt-12 h-full w-full max-w-[750px]">
 	<div class="flex w-full items-center justify-between">
 		<div class="flex flex-col">
 			<p class="text-xl">Hello</p>
