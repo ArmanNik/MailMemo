@@ -51,38 +51,46 @@
 	}
 
 	async function syncCalendars() {
-		const execution = await functions.createExecution(
-			'syncCalendarScheduler',
-			'',
-			false,
-			'/v1/scheduler/intervals',
-			ExecutionMethod.POST
-		);
-		const isOk = execution.responseStatusCode;
-
-		if (!isOk) {
-			alert(
-				execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
+		try {
+			const execution = await functions.createExecution(
+				'syncCalendarScheduler',
+				'',
+				false,
+				'/v1/scheduler/intervals',
+				ExecutionMethod.POST
 			);
-			return;
+			const isOk = execution.responseStatusCode;
+
+			if (!isOk) {
+				toast(
+					execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
+				);
+				return;
+			}
+		} catch (error) {
+			toast(error as string);
 		}
 	}
 
 	async function sendEmail() {
-		const execution = await functions.createExecution(
-			'sendMails',
-			'',
-			false,
-			'/v1/scheduler/intervals',
-			ExecutionMethod.POST
-		);
-		const isOk = execution.responseStatusCode;
-
-		if (!isOk) {
-			alert(
-				execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
+		try {
+			const execution = await functions.createExecution(
+				'sendMails',
+				'',
+				false,
+				'/v1/scheduler/intervals',
+				ExecutionMethod.POST
 			);
-			return;
+			const isOk = execution.responseStatusCode;
+
+			if (!isOk) {
+				toast(
+					execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
+				);
+				return;
+			}
+		} catch (error) {
+			toast(error as string);
 		}
 	}
 

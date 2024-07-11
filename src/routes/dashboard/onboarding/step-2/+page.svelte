@@ -51,6 +51,7 @@
 				await goto('/dashboard/onboarding/step-3');
 			}
 		} catch (error) {
+			toast(error as string);
 			console.log(error);
 		}
 	}

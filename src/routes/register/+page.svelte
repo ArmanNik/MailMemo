@@ -7,6 +7,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { base } from '$app/paths';
 	import Unauthenticated from '$lib/components/unauthenticated.svelte';
+	import { toast } from 'svelte-sonner';
 
 	let email = '';
 	let password = '';
@@ -19,6 +20,8 @@
 
 			await goto(`${base}/dashboard`);
 		} catch (error) {
+			const message = (error as Error)?.message ?? error;
+			toast(message);
 			console.log(error);
 		}
 	}
@@ -32,6 +35,8 @@
 				['repo', 'user']
 			);
 		} catch (error) {
+			const message = (error as Error)?.message ?? error;
+			toast(message);
 			console.log(error);
 		}
 	}

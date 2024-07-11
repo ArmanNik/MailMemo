@@ -6,6 +6,7 @@
 	import Unauthenticated from '$lib/components/unauthenticated.svelte';
 	import { account } from '$lib/sdk';
 	import { OAuthProvider } from 'appwrite';
+	import { toast } from 'svelte-sonner';
 
 	let email = '';
 	let password = '';
@@ -15,6 +16,8 @@
 			await account.createEmailPasswordSession(email, password);
 			await goto('/dashboard');
 		} catch (error) {
+			const message = (error as Error)?.message ?? error;
+			toast(message);
 			console.log(error);
 		}
 	}
@@ -28,6 +31,8 @@
 				['repo', 'user']
 			);
 		} catch (error) {
+			const message = (error as Error)?.message ?? error;
+			toast(message);
 			console.log(error);
 		}
 	}
