@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { onMount } from 'svelte';
-	import { step } from '../store';
+	import { preferences, step } from '../store';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
 	import { account } from '$lib/sdk';
@@ -19,15 +19,17 @@
 		if (!form.checkValidity()) {
 			form.requestSubmit();
 		}
-		try {
-			await account.updatePrefs({
-				...$user.prefs,
-				period
-			});
-			await goto('/dashboard/onboarding/step-4');
-		} catch (error) {
-			console.log(error);
-		}
+		preferences.set({ period });
+		await goto('/dashboard/onboarding/step-4');
+
+		// try {
+		// 	await account.updatePrefs({
+		// 		...$user.prefs,
+		// 		period
+		// 	});
+		// } catch (error) {
+		// 	console.log(error);
+		// }
 	}
 </script>
 
@@ -36,7 +38,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="font-header mt-6 max-w-[80%] text-3xl tracking-tight">
+	<h1 class="mt-6 max-w-[80%] font-header text-3xl tracking-tight">
 		Set period for event reminders
 	</h1>
 	<p class="mt-4 text-muted-foreground">

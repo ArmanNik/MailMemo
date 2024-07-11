@@ -1,16 +1,18 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { onMount } from 'svelte';
-	import { step } from '../store';
+	import { preferences, step } from '../store';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
-	import { account } from '$lib/sdk';
+	import { account, functions } from '$lib/sdk';
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import { user } from '$lib/stores';
 	import * as Select from '$lib/components/ui/select';
+	import { toast } from 'svelte-sonner';
+	import { ExecutionMethod } from 'appwrite';
 
 	let frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'daily';
-	let frequencyDetail: string = '';
+	let frequencyDetails: string = '';
 	let form: HTMLFormElement;
 
 	const monthlyDetailOptions = [
@@ -42,14 +44,58 @@
 		try {
 			await account.updatePrefs({
 				...$user.prefs,
+				...$preferences,
 				frequency,
-				frequencyDetail,
+				frequencyDetail: frequencyDetails,
 				onboarded: true
 			});
-			await goto('/dashboard');
+
+			const cestDate = transformLocalToCEST(
+				$preferences.hour,
+				$preferences.minute,
+				$preferences.format
+			);
+			const cestHour = cestDate.getHours();
+			const cestMinute = cestDate.getMinutes();
+
+			const execution = await functions.createExecution(
+				'api',
+				JSON.stringify({
+					hours: cestHour,
+					minutes: cestMinute,
+					format: $preferences.format.toLowerCase(),
+					frequency,
+					frequencyDetails
+				}),
+				false,
+				'/v1/scheduler/intervals',
+				ExecutionMethod.PATCH
+			);
+			const isOk = execution.responseStatusCode === 200;
+
+			if (!isOk) {
+				toast(
+					execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
+				);
+				return;
+			} else {
+				await goto('/dashboard');
+			}
 		} catch (error) {
+			toast(error as string);
 			console.log(error);
 		}
+	}
+
+	function transformLocalToCEST(hour: string, minute: string, format: string) {
+		const intHour = format === 'PM' ? parseInt(hour) + 12 : parseInt(hour);
+		const date = new Date();
+		date.setHours(intHour);
+		date.setMinutes(parseInt(minute));
+		date.setSeconds(0);
+		date.setMilliseconds(0);
+		const cestDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+		return cestDate;
 	}
 </script>
 
@@ -58,7 +104,7 @@
 </svelte:head>
 
 <div>
-	<h1 class="font-header mt-6 max-w-[80%] text-3xl tracking-tight">
+	<h1 class="mt-6 max-w-[80%] font-header text-3xl tracking-tight">
 		Set the frequency of receiving reminders
 	</h1>
 	<p class="mt-4 text-muted-foreground">Decide how often you want to receive email reminders.</p>
@@ -80,7 +126,7 @@
 							items={weeklyDetailOptions}
 							onSelectedChange={(s) => {
 								if (s?.value) {
-									frequencyDetail = s.value;
+									frequencyDetails = s.value;
 								}
 							}}
 						>
@@ -105,7 +151,7 @@
 							items={monthlyDetailOptions}
 							onSelectedChange={(s) => {
 								if (s?.value) {
-									frequencyDetail = s.value;
+									frequencyDetails = s.value;
 								}
 							}}
 						>

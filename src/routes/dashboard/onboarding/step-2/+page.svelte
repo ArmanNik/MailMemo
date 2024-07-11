@@ -2,7 +2,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Select from '$lib/components/ui/select';
 	import { onMount } from 'svelte';
-	import { step } from '../store';
+	import { preferences, step } from '../store';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { goto } from '$app/navigation';
@@ -23,48 +23,13 @@
 		if (!form.checkValidity()) {
 			form.requestSubmit();
 		}
-		try {
-			const cestDate = transformLocalToCEST(hour, minute, format);
-			const cestHour = cestDate.getHours();
-			const cestMinute = cestDate.getMinutes();
-
-			const execution = await functions.createExecution(
-				'api',
-				JSON.stringify({
-					hours: cestHour,
-					minutes: cestMinute,
-					format: format.toLowerCase(),
-					timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-				}),
-				false,
-				'/v1/scheduler/intervals',
-				ExecutionMethod.PATCH
-			);
-			const isOk = execution.responseStatusCode === 200;
-
-			if (!isOk) {
-				toast(
-					execution.responseBody ? execution.responseBody : 'Unexpected error. Please try again.'
-				);
-				return;
-			} else {
-				await goto('/dashboard/onboarding/step-3');
-			}
-		} catch (error) {
-			toast(error as string);
-			console.log(error);
-		}
-	}
-
-	function transformLocalToCEST(hour: string, minute: string, format: string) {
-		const intHour = format === 'PM' ? parseInt(hour) + 12 : parseInt(hour);
-		const date = new Date();
-		date.setHours(intHour);
-		date.setMinutes(parseInt(minute));
-		date.setSeconds(0);
-		date.setMilliseconds(0);
-		const cestDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
-		return cestDate;
+		preferences.set({
+			hour,
+			minute,
+			format,
+			timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+		});
+		await goto('/dashboard/onboarding/step-3');
 	}
 
 	$: if (parseInt(hour) > 12) {
