@@ -61,12 +61,7 @@ Calendar URL is not valid
 
 ## ⚙️ Configuration
 
-| Setting           | Value         |
-| ----------------- | ------------- |
-| Runtime           | Go (1.22)     |
-| Entrypoint        | `main.go`     |
-| Timeout (Seconds) | 15            |
-| Scopes            | `users.write` |
+All settings of a function can be found in `appwrite.json` file in root of this repository.
 
 ## 🔒 Environment Variables
 

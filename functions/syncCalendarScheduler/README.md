@@ -16,13 +16,7 @@ OK
 
 ## ⚙️ Configuration
 
-| Setting           | Value         |
-| ----------------- | ------------- |
-| Runtime           | Go (1.22)     |
-| Entrypoint        | `main.go`     |
-| Cron              | `*/15 * * * *`|
-| Timeout (Seconds) | 900           |
-| Scopes            | `execution.write`, `databases.read` |
+All settings of a function can be found in `appwrite.json` file in root of this repository.
 
 ## 🔒 Environment Variables
 

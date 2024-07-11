@@ -15,12 +15,12 @@ func Main(Context *types.Context) types.ResponseOutput {
 	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
 
 	action := Context.Req.Method + " " + Context.Req.Path
-
-	if action == "PATCH /v1/scheduler/intervals" {
+	switch a := action; a {
+	case "PATCH /v1/scheduler/intervals":
 		return services.UpdateSchedulerInterval(Context, appwriteClient)
-	} else if action == "POST /v1/calendars" {
+	case "POST /v1/calendars":
 		return services.CreateCalendar(Context, appwriteClient)
+	default:
+		return Context.Res.Text("Not Found", 404, nil)
 	}
-
-	return Context.Res.Text("Not Found", 404, nil)
 }
