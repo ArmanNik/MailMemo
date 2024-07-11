@@ -41,7 +41,7 @@
 					'v1/calendars',
 					ExecutionMethod.POST
 				);
-				const isOk = execution.responseStatusCode;
+				const isOk = execution.responseStatusCode === 200;
 
 				if (!isOk) {
 					toast(

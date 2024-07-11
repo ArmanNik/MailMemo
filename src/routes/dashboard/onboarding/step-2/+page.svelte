@@ -40,7 +40,7 @@
 				'/v1/scheduler/intervals',
 				ExecutionMethod.PATCH
 			);
-			const isOk = execution.responseStatusCode;
+			const isOk = execution.responseStatusCode === 200;
 
 			if (!isOk) {
 				toast(

@@ -89,7 +89,7 @@
 				'/v1/scheduler/intervals',
 				ExecutionMethod.POST
 			);
-			const isOk = execution.responseStatusCode;
+			const isOk = execution.responseStatusCode === 200;
 
 			if (!isOk) {
 				toast(
