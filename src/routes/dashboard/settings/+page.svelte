@@ -30,6 +30,7 @@
 		src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXB1c25iZTU3cTJjYWZvdjdldWRyOWt3ZTJ0cGQ2Mm8xZm5lZzRpbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/B9TcUZLrpj9KFD5cLw/giphy.webp"
 		alt=""
 	/>
+	<a href="/dashboard" class="underline">Go back</a>
 </div>
 
 <div class="flex w-full justify-end">

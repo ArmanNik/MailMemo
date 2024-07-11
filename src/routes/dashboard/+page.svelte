@@ -94,11 +94,11 @@
 	<title>Dashboard - MailMemo</title>
 </svelte:head>
 
-<div class="mt-12 h-full w-full max-w-[750px] pb-16 lg:pb-0">
+<div class=" h-full w-full max-w-[750px] pb-16 lg:pb-0">
 	<div class="flex w-full justify-between">
-		<div class="flex flex-col">
-			<p class="font-header text-xl">Hello</p>
-			<h3 class="font-header text-2xl">
+		<div class="flex flex-col gap-2">
+			<p class="font-header text-xl font-light">Hello</p>
+			<h3 class="font-header text-3xl tracking-tight">
 				{$user?.name}
 			</h3>
 		</div>
@@ -106,7 +106,7 @@
 			<img src="/icons/cog.svg" alt="settings" />
 		</a>
 	</div>
-	<div class="mt-3 flex gap-2">
+	<div class="mt-3 flex flex-wrap gap-2">
 		{#if data?.calendars?.total}
 			{#each data.calendars.documents as calendar}
 				<Badge variant="outline">
@@ -129,8 +129,8 @@
 		{#if todayEvents?.length}
 			{#each todayEvents as event, i}
 				{@const calendar = data.calendars.documents.find((c) => c.$id === event.calendarId)}
-				<Card.Root class={`frosted ${evaluateCornerRadius(i, todayEvents?.length)}`}>
-					<Card.Header class="p-4">
+				<Card.Root class={`frosted ${evaluateCornerRadius(i, todayEvents?.length)} `}>
+					<Card.Header class="gap-2 p-4">
 						<Card.Description>
 							<div class="flex h-3 items-center gap-2">
 								<p>
@@ -148,7 +148,7 @@
 							</div>
 						</Card.Description>
 
-						<p class="mt-2">{event.name}</p>
+						<p class="font-header text-lg leading-4">{event.name}</p>
 					</Card.Header>
 				</Card.Root>
 			{/each}
@@ -169,28 +169,35 @@
 								In {group[0]} days
 							</Badge>
 						</span>
-						{#each group[1] as event, i}
-							{@const calendar = data.calendars.documents.find((c) => c.$id === event.calendarId)}
-							<Separator class="mt-3" />
-							<Card.Description class="pt-4">
-								<div class="flex h-3 items-center gap-2">
-									<p>
-										{toLocaleTimeISO(event.startAt, false)} - {toLocaleTimeISO(event.endAt, false)}
-									</p>
-									<Separator orientation="vertical" class="h-full" />
+						<div class="flex flex-col gap-2">
+							{#each group[1] as event, i}
+								{@const calendar = data.calendars.documents.find((c) => c.$id === event.calendarId)}
+								<Separator class="mt-3" />
+								<Card.Description class="pt-4">
+									<div class="flex h-3 items-center gap-2">
+										<p>
+											{toLocaleTimeISO(event.startAt, false)} - {toLocaleTimeISO(
+												event.endAt,
+												false
+											)}
+										</p>
+										<Separator orientation="vertical" class="h-full" />
 
-									<span class="flex items-center gap-2">
-										<span
-											class="h-2 w-2 rounded-full"
-											style={`background-color: ${calendar?.color}`}
-										/>
-										<p>{calendar?.name}</p>
-									</span>
-								</div>
-							</Card.Description>
+										<span class="flex items-center gap-2">
+											<span
+												class="h-2 w-2 rounded-full"
+												style={`background-color: ${calendar?.color}`}
+											/>
+											<p>{calendar?.name}</p>
+										</span>
+									</div>
+								</Card.Description>
 
-							<p class="mt-2" class:pb-4={i + 1 !== group[1]?.length}>{event.name}</p>
-						{/each}
+								<p class="font-header mt-2 text-lg leading-4">
+									{event.name}
+								</p>
+							{/each}
+						</div>
 					</Card.Header>
 				</Card.Root>
 			{/each}
@@ -205,5 +212,5 @@
 >
 	<Button variant="outline" class="w-full lg:w-auto" on:click={syncCalendars}>Sync calendars</Button
 	>
-	<Button class="w-full lg:w-auto" on:click={sendEmail}>Send Email</Button>
+	<Button class="w-full lg:w-auto" on:click={sendEmail}>Send email</Button>
 </div>

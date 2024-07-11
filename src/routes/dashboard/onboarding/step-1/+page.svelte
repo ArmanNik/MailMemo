@@ -56,8 +56,10 @@
 </svelte:head>
 
 <div>
-	<h1 class="font-header mt-6 text-3xl">Connect a calendar to get started</h1>
-	<p class="mt-4 text-balance text-muted-foreground">
+	<h1 class="font-header mt-6 max-w-[80%] text-3xl tracking-tight">
+		Connect a calendar to get started
+	</h1>
+	<p class="mt-4 text-muted-foreground">
 		Link your preferred calendar to seamlessly manage all your important events and reminders.
 	</p>
 	{#if !selectedProvider}
@@ -134,7 +136,7 @@
 			</div>
 			<div class="grid gap-2">
 				<Label for="url">Calendar color</Label>
-				<div class="flex gap-2">
+				<div class="mt-2 flex gap-1">
 					{#each CalColors as c}
 						<button
 							type="button"

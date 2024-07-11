@@ -10,8 +10,8 @@
 	import { ExecutionMethod } from 'appwrite';
 	import { toast } from 'svelte-sonner';
 
-	let hour: string;
-	let minute: string;
+	let hour: string = '09';
+	let minute: string = '00';
 	let format: string = 'AM';
 	let form: HTMLFormElement;
 
@@ -79,8 +79,10 @@
 </svelte:head>
 
 <div>
-	<h1 class="font-header mt-6 text-3xl">Select the time to receive reminders</h1>
-	<p class="mt-4 text-balance text-muted-foreground">
+	<h1 class="font-header mt-6 max-w-[80%] text-3xl tracking-tight">
+		Select the time to receive reminders
+	</h1>
+	<p class="mt-4 text-muted-foreground">
 		Pick the best time of day for us to send you email reminder about your upcoming events.
 	</p>
 
@@ -125,6 +127,7 @@
 			</Select.Root>
 		</div>
 	</form>
+	<p class="mt-2 text-muted-foreground">Your reminder email will be sent at {hour}.</p>
 </div>
 
 <div class="mt-auto flex justify-between">

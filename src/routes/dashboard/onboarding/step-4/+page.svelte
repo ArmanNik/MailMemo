@@ -58,10 +58,10 @@
 </svelte:head>
 
 <div>
-	<h1 class="font-header mt-6 text-3xl">Set the frequency of receiving reminders</h1>
-	<p class="mt-4 text-balance text-muted-foreground">
-		Decide how often you want to receive email reminders.
-	</p>
+	<h1 class="font-header mt-6 max-w-[80%] text-3xl tracking-tight">
+		Set the frequency of receiving reminders
+	</h1>
+	<p class="mt-4 text-muted-foreground">Decide how often you want to receive email reminders.</p>
 
 	<form class="mt-20" on:submit|preventDefault bind:this={form}>
 		<RadioGroup.Root bind:value={frequency}>
@@ -70,9 +70,11 @@
 					<RadioGroup.Item value="daily" id="daily" />
 					<Label for="daily">Daily</Label>
 				</div>
-				<div class="flex min-h-10 items-center space-x-2 px-1">
-					<RadioGroup.Item value="weekly" id="weekly" />
-					<Label for="weekly">Weekly</Label>
+				<div class="flex min-h-10 items-center gap-5">
+					<div class="flex items-center space-x-2 px-1">
+						<RadioGroup.Item value="weekly" id="weekly" />
+						<Label for="weekly">Weekly</Label>
+					</div>
 					{#if frequency === 'weekly'}
 						<Select.Root
 							items={weeklyDetailOptions}
@@ -82,7 +84,7 @@
 								}
 							}}
 						>
-							<Select.Trigger class="w-[180px]">
+							<Select.Trigger class=" w-full lg:w-[180px]">
 								<Select.Value placeholder="Day in week" />
 							</Select.Trigger>
 							<Select.Content>
@@ -93,9 +95,11 @@
 						</Select.Root>
 					{/if}
 				</div>
-				<div class="flex min-h-10 items-center space-x-2 px-1">
-					<RadioGroup.Item value="monthly" id="monthly" />
-					<Label for="monthly">Monthly</Label>
+				<div class="flex min-h-10 items-center gap-5">
+					<div class="flex items-center space-x-2 px-1">
+						<RadioGroup.Item value="monthly" id="monthly" />
+						<Label for="monthly">Monthly</Label>
+					</div>
 					{#if frequency === 'monthly'}
 						<Select.Root
 							items={monthlyDetailOptions}
@@ -105,7 +109,7 @@
 								}
 							}}
 						>
-							<Select.Trigger class="w-[180px]">
+							<Select.Trigger class="w-full lg:w-[180px]">
 								<Select.Value placeholder="Day in month" />
 							</Select.Trigger>
 							<Select.Content>

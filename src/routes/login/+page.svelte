@@ -72,7 +72,7 @@
 
 		<Button variant="outline" class="frosted w-full" on:click={handleGitHubLogin}>
 			<img src="/icons/github.svg" alt="github" />
-			<span class="ml-2"> Login with GitHub </span>
+			<span class="ml-2"> Sign in with GitHub </span>
 		</Button>
 	</form>
 
