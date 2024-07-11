@@ -1,10 +1,11 @@
+import { Dependencies } from '$lib/costants.js';
 import { account } from '$lib/sdk';
 import { redirect } from '@sveltejs/kit';
 
 export const ssr = false;
 
 export const load = async ({ depends, url }) => {
-	// depends(Dependencies.ACCOUNT);
+	depends(Dependencies.ACCOUNT);
 
 	try {
 		const user = await account.get();
