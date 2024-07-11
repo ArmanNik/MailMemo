@@ -149,7 +149,10 @@
 		{#if data?.calendars?.total}
 			{#each data.calendars.documents as calendar}
 				<Badge variant="outline">
-					<div class="h-2 w-2 rounded-full" style={`background-color: ${calendar.color}`}></div>
+					<div
+						class="h-2 w-2 rounded-full"
+						style={`background-color: ${colorToHex(calendar.color)}`}
+					></div>
 					<p class="ml-2">{calendar.name}</p>
 				</Badge>
 			{/each}
