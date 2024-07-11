@@ -39,10 +39,10 @@
 
 <Unauthenticated>
 	<div class="grid gap-2">
-		<h1 class="text-3xl font-bold">Sign in</h1>
+		<h1 class="font-header text-4xl">Sign in</h1>
 		<p class="text-balance text-muted-foreground">Sign in to continue</p>
 	</div>
-	<form class="grid gap-4" on:submit|preventDefault={handleSubmit}>
+	<form class="mt-9 grid gap-4" on:submit|preventDefault={handleSubmit}>
 		<div class="grid gap-2">
 			<Input
 				class="frosted"
@@ -63,7 +63,7 @@
 				bind:value={password}
 			/>
 		</div>
-		<Button type="submit" class="w-full">Login</Button>
+		<Button type="submit" class="w-full">Sign in</Button>
 		<div class=" grid grid-cols-3 items-center">
 			<Separator />
 			<p class="text-center text-sm text-muted-foreground">or</p>

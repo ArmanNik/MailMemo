@@ -41,10 +41,10 @@
 
 <Unauthenticated>
 	<div class="grid gap-2">
-		<h1 class="text-3xl font-bold">Sign up</h1>
+		<h1 class="font-header text-4xl">Sign up</h1>
 		<p class="text-balance text-muted-foreground">Sign up to continue</p>
 	</div>
-	<form class="grid gap-4" on:submit|preventDefault={handleSubmit}>
+	<form class="mt-9 grid gap-4" on:submit|preventDefault={handleSubmit}>
 		<div class="grid gap-2">
 			<Input
 				id="name"
