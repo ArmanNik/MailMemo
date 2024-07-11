@@ -15,7 +15,7 @@
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	let selectedProvider: 'google' | 'apple' | 'outlook' | 'url' | null = null;
-	let name = '';
+	let name = 'Default calendar';
 	let url = '';
 	let color = 'pink';
 	let form: HTMLFormElement;
@@ -57,7 +57,7 @@
 						firstCal: true
 					});
 					if ($user?.prefs?.onboarded) {
-						await goto('/dashboard/dashboard');
+						await goto('/dashboard');
 					} else {
 						await goto('/dashboard/onboarding/step-2');
 					}
@@ -73,7 +73,7 @@
 	}
 
 	$: if (!selectedProvider) {
-		name = '';
+		name = 'Default calendar';
 		url = '';
 		color = 'pink';
 	}
