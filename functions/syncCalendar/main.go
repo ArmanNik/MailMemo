@@ -46,6 +46,8 @@ func Main(Context *types.Context) types.ResponseOutput {
 		return Context.Res.Text("Error", 500, nil)
 	}
 
+	Context.Log(calendarId)
+
 	// TODO: Use getDocument
 	calendarResponse, err := appwriteDatabases.ListDocuments("main", "calendars", databases.WithListDocumentsQueries([]interface{}{
 		query.Equal("$id", calendarId),
@@ -146,11 +148,13 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 		if cursor == "INIT" {
 			queries = []interface{}{
+				query.Equal("calendarId", calendarId),
 				query.Select([]interface{}{"$id", "uid"}),
 				query.Limit(1000),
 			}
 		} else {
 			queries = []interface{}{
+				query.Equal("calendarId", calendarId),
 				query.Select([]interface{}{"$id", "uid"}),
 				query.Limit(1000),
 				query.CursorAfter(cursor),
@@ -210,6 +214,10 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 		}
 
 		eventIds = append(eventIds, event.Uid)
+	}
+
+	if len(eventIds) == 0 {
+		return nil
 	}
 
 	eventsResponse, err := appwriteDatabases.ListDocuments("main", "events", databases.WithListDocumentsQueries([]interface{}{
@@ -272,7 +280,7 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 			}
 
 			if newLastModified.After(oldLastModified) {
-				Context.Log("Updaring " + event.Uid)
+				Context.Log("Updating " + event.Uid)
 
 				wg.Add(1)
 				go func(e EventMinimal) {

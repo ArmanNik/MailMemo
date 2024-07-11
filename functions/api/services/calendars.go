@@ -58,6 +58,11 @@ func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.
 		return Context.Res.Text("URL is not a valid calendar", 400, nil)
 	}
 
+	if len(c.Events) == 0 {
+		Context.Error("No events found")
+		return Context.Res.Text("URL is not a valid calendar", 400, nil)
+	}
+
 	// Ensure it's user-executed
 	userId, userIdOk := Context.Req.Headers["x-appwrite-user-id"]
 	if !userIdOk || userId == "" {

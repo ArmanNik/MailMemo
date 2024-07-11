@@ -69,6 +69,8 @@ func Main(Context *types.Context) types.ResponseOutput {
 			go func(id string) {
 				defer wg.Done()
 
+				Context.Log("Executing sync for calendar " + id)
+
 				_, err := appwriteFunctions.CreateExecution(
 					"syncCalendar",
 					functions.WithCreateExecutionAsync(true),

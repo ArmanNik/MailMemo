@@ -40,7 +40,9 @@
             "$id": "sendMails",
             "name": "sendMails",
             "runtime": "go-1.22",
-            "execute": [],
+            "execute": [
+                "users"
+            ],
             "events": [],
             "schedule": "",
             "timeout": 60,
@@ -50,9 +52,9 @@
             "commands": "",
             "path": "functions/sendMails",
             "scopes": [
-                "messages.write",
                 "users.read",
-                "documents.read"
+                "documents.read",
+                "execution.write"
             ]
         },
         {
@@ -132,6 +134,21 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/api"
+        },
+        {
+            "$id": "nodeSendMailInternal",
+            "name": "nodeSendMailInternal",
+            "runtime": "node-18.0",
+            "execute": [],
+            "events": [],
+            "scopes": ["messages.write"],
+            "schedule": "",
+            "timeout": 30,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/main.js",
+            "commands": "npm install",
+            "path": "functions/nodeSendMailInternal"
         }
     ],
     "databases": [

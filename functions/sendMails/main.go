@@ -1,19 +1,15 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/Boostport/mjml-go"
 	"github.com/appwrite/sdk-for-go/client"
 	"github.com/appwrite/sdk-for-go/databases"
-	"github.com/appwrite/sdk-for-go/id"
-	"github.com/appwrite/sdk-for-go/messaging"
+	"github.com/appwrite/sdk-for-go/functions"
 	"github.com/appwrite/sdk-for-go/query"
 	"github.com/appwrite/sdk-for-go/users"
 	"github.com/open-runtimes/types-for-go/v4"
@@ -54,7 +50,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
 	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
 
-	appwriteMessaging := messaging.NewMessaging(appwriteClient)
+	appwriteFunctions := functions.NewFunctions(appwriteClient)
 	appwriteUsers := users.NewUsers(appwriteClient)
 	appwriteDatabases := databases.NewDatabases(appwriteClient)
 
@@ -446,40 +442,30 @@ func Main(Context *types.Context) types.ResponseOutput {
 		</mjml>
 	`
 
-	output, err := mjml.ToHTML(
-		context.Background(),
-		input,
-		mjml.WithValidationLevel(mjml.Strict),
-		mjml.WithBeautify(false),
-		mjml.WithMinify(true),
-		mjml.WithKeepComments(false),
-	)
-
-	var mjmlError mjml.Error
-	if errors.As(err, &mjmlError) {
-		errorAsJson, _ := json.Marshal(mjmlError)
-		Context.Error(string(errorAsJson[:]))
+	data := map[string]interface{}{
+		"subject": subject,
+		"userId":  userId,
+		"html":    input,
 	}
-
-	message, err := appwriteMessaging.CreateEmail(
-		id.Unique(),
-		subject,
-		output,
-		messaging.WithCreateEmailHtml(true),
-		messaging.WithCreateEmailUsers([]interface{}{
-			userStruct.Id,
-		}),
-	)
-
+	jsonData, err := json.Marshal(data)
 	if err != nil {
 		Context.Error(err)
 		return Context.Res.Text("Error", 500, nil)
 	}
 
-	Context.Log("Message ID: " + message.Id)
+	_, executionErr := appwriteFunctions.CreateExecution(
+		"nodeSendMailInternal",
+		functions.WithCreateExecutionBody(string(jsonData)),
+		functions.WithCreateExecutionAsync(true),
+		functions.WithCreateExecutionMethod("POST"),
+	)
+
+	if executionErr != nil {
+		Context.Error(executionErr)
+		return Context.Res.Text("Error", 500, nil)
+	}
 
 	return Context.Res.Text("OK", 200, nil)
-
 }
 
 func getHex(color string) string {
