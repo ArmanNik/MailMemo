@@ -5,6 +5,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import { toLocaleTimeISO } from '$lib/utils';
 	import EmptyCard from './emptyCard.svelte';
+	import type { CalEvent } from '$lib/calendars';
 
 	export let data;
 
@@ -24,13 +25,35 @@
 			}
 		}
 	}
-	$: console.log(data);
 	$: todayEvents = data?.events?.documents?.filter((event) => {
 		const eventDate = new Date(event.startAt);
 		const today = new Date();
 		return eventDate.getDate() === today.getDate();
 	});
+
+	$: futureEvents = data?.events?.documents?.filter((event) => {
+		const eventDate = new Date(event.startAt);
+		const today = new Date();
+		return eventDate.getDate() > today.getDate();
+	});
+	//Group events that are in the same day. Use the number of days from today as the key
+	$: futureEventsGrouped = futureEvents?.reduce((acc: Record<string, CalEvent[]>, event) => {
+		const eventDate = new Date(event.startAt);
+		const today = new Date();
+		const days = eventDate.getDate() - today.getDate();
+		if (!acc[days]) {
+			acc[days] = [];
+		}
+		acc[days].push(event as CalEvent);
+		return acc;
+	}, {});
+
+	$: console.log(futureEvents, futureEventsGrouped, Object.entries(futureEventsGrouped));
 </script>
+
+<svelte:head>
+	<title>Dashboard - MailMemo</title>
+</svelte:head>
 
 <div class=" mt-12 h-full w-full">
 	<div class="flex w-full items-center justify-between">
@@ -59,7 +82,7 @@
 	<Separator class="mt-5" />
 	<h1 class="mt-6 text-xl">Today</h1>
 
-	<div class="mt-4 grid gap-1">
+	<div class="mt-4 grid gap-2">
 		{#if todayEvents?.length}
 			{#each todayEvents as event, i}
 				{@const calendar = data.calendars.documents.find((c) => c.$id === event.calendarId)}
@@ -92,13 +115,41 @@
 	</div>
 	<h1 class="mt-8 text-xl">Upcoming Events</h1>
 
-	<div class="mt-4 grid gap-4">
-		{#if data?.events?.total}
-			{#each data.events.documents as event}
-				<div class="grid gap-2">
-					<p class="text-sm text-muted-foreground">{event.start}</p>
-					<p class="text-lg">{event.title}</p>
-				</div>
+	<div class="mt-4 grid gap-2">
+		{#if futureEvents?.length}
+			{@const groupedByDay = Object.entries(futureEventsGrouped)}
+			{#each groupedByDay as group, groupIndex}
+				<Card.Root class={`frosted ${evaluateCornerRadius(groupIndex, groupedByDay?.length)}`}>
+					<Card.Header class="p-4">
+						<span class="mb-2">
+							<Badge>
+								In {group[0]} days
+							</Badge>
+						</span>
+						{#each group[1] as event, i}
+							{@const calendar = data.calendars.documents.find((c) => c.$id === event.calendarId)}
+							<Separator class="mt-3" />
+							<Card.Description class="pt-4">
+								<div class="flex h-3 items-center gap-2">
+									<p>
+										{toLocaleTimeISO(event.startAt, false)} - {toLocaleTimeISO(event.endAt, false)}
+									</p>
+									<Separator orientation="vertical" class="h-full" />
+
+									<span class="flex items-center gap-2">
+										<span
+											class="h-2 w-2 rounded-full"
+											style={`background-color: ${calendar?.color}`}
+										/>
+										<p>{calendar?.name}</p>
+									</span>
+								</div>
+							</Card.Description>
+
+							<p class="mt-2" class:pb-4={i + 1 !== group[1]?.length}>{event.name}</p>
+						{/each}
+					</Card.Header>
+				</Card.Root>
 			{/each}
 		{:else}
 			<EmptyCard />
