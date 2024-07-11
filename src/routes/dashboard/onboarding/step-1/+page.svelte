@@ -12,12 +12,14 @@
 	import { CalColors, colorToHex } from '$lib/calendars';
 	import { toast } from 'svelte-sonner';
 	import { user } from '$lib/stores';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	let selectedProvider: 'google' | 'apple' | 'outlook' | 'url' | null = null;
 	let name = '';
 	let url = '';
 	let color = 'pink';
 	let form: HTMLFormElement;
+	let disableNext = false;
 
 	onMount(() => {
 		step.set(1);
@@ -29,6 +31,7 @@
 			return;
 		}
 		if (selectedProvider === 'url') {
+			disableNext = true;
 			try {
 				const execution = await functions.createExecution(
 					'api',
@@ -63,6 +66,8 @@
 				console.log(error);
 				const message = (error as Error)?.message;
 				toast(message);
+			} finally {
+				disableNext = false;
 			}
 		}
 	}
@@ -182,6 +187,11 @@
 <div class="mt-auto flex justify-between">
 	{#if selectedProvider}
 		<Button variant="outline" on:click={() => (selectedProvider = null)}>Back</Button>
-		<Button on:click={handleNext}>Next</Button>
+		<Button on:click={handleNext} disabled={disableNext}>
+			<!-- {#if disableNext}
+				<LoaderCircle class="h-6 w-6" />
+			{/if} -->
+			Next
+		</Button>
 	{/if}
 </div>
