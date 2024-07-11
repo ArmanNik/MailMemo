@@ -25,6 +25,7 @@
 	async function handleNext() {
 		if (!form.checkValidity()) {
 			form.requestSubmit();
+			return;
 		}
 		if (selectedProvider === 'url') {
 			try {

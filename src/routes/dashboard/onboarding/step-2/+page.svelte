@@ -127,7 +127,11 @@
 			</Select.Root>
 		</div>
 	</form>
-	<p class="mt-2 text-muted-foreground">Your reminder email will be sent at {hour}.</p>
+	<p class="mt-2 text-muted-foreground">
+		Your reminder email will be sent at {format === 'PM'
+			? parseInt(hour) + 12
+			: parseInt(hour)}:{minute}.
+	</p>
 </div>
 
 <div class="mt-auto flex justify-between">
