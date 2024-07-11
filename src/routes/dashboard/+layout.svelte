@@ -14,7 +14,7 @@
 		}
 		let previousStatus: string | null = null;
 
-		return client.subscribe<Models.Document>('documets', (message) => {
+		return client.subscribe<Models.Document>('documents', (message) => {
 			if (previousStatus === message.payload.status) {
 				return;
 			}

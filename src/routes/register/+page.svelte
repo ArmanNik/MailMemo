@@ -15,6 +15,8 @@
 	async function handleSubmit() {
 		try {
 			await account.create(ID.unique(), email, password, name);
+			await account.createEmailPasswordSession(email, password);
+
 			await goto(`${base}/dashboard`);
 		} catch (error) {
 			console.log(error);
