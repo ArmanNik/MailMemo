@@ -88,7 +88,13 @@ func Main(Context *types.Context) types.ResponseOutput {
 	userPrefs := userStruct.Prefs.(map[string]interface{})
 	timezoneString := userPrefs["timezone"].(string)
 	periodString := userPrefs["period"].(string)
+	isUnsubscribed := userPrefs["unsubscribed"].(bool)
 	userTimezone, timezoneErr := time.LoadLocation(timezoneString)
+
+	if isUnsubscribed {
+		Context.Log("User is unsubscribed")
+		return Context.Res.Text("OK", 200, nil)
+	}
 
 	if timezoneErr != nil {
 		Context.Error(timezoneErr)

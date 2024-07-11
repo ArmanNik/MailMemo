@@ -30,10 +30,9 @@ Sample `4XX` or `5XX` Response:
 Error updating user labels
 ```
 
-
 ### POST /v1/calendars
 
-- Sets user's label based on his onboarding prefferences.
+- Add new calendar for an user
 
 **Request**
 
@@ -57,6 +56,34 @@ Sample `4XX` or `5XX` Response:
 
 ```text
 Calendar URL is not valid
+```
+
+### DELETE /v1/subscriptions
+
+- Mark account unsubscribed from all emails
+
+> This endpoint is public and does not require user session
+
+**Request**
+
+```json
+{
+  "email": "matej@appwrite.io"
+}
+```
+
+**Response**
+
+Sample `200` Response:
+
+```text
+OK
+```
+
+Sample `4XX` or `5XX` Response:
+
+```text
+Could not mark as unsubscribed
 ```
 
 ## ⚙️ Configuration

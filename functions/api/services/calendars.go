@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/appwrite/sdk-for-go/client"
 	"github.com/appwrite/sdk-for-go/databases"
@@ -23,6 +24,11 @@ func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.
 	err := json.Unmarshal(Context.Req.BodyBinary(), &body)
 	if err != nil {
 		return Context.Res.Text("Invalid body.", 400, nil)
+	}
+
+	// Transformers
+	if strings.HasPrefix(body.Url, "webcal://") {
+		body.Url = "https://" + body.Url[len("webcal://"):]
 	}
 
 	// Validators
