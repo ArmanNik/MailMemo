@@ -15,7 +15,7 @@
 	let selectedProvider: 'google' | 'apple' | 'outlook' | 'url' | null = null;
 	let name = '';
 	let url = '';
-	let color = '';
+	let color = 'pink';
 	let form: HTMLFormElement;
 
 	onMount(() => {
@@ -61,7 +61,7 @@
 	$: if (!selectedProvider) {
 		name = '';
 		url = '';
-		color = '';
+		color = 'pink';
 	}
 </script>
 
