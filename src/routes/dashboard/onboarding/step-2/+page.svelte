@@ -66,11 +66,17 @@
 		return cestDate;
 	}
 
-	$: if (hour && minute && format) {
-		const cestDate = transformLocalToCEST(hour, minute, format);
-		const cestHour = cestDate.getHours().toString();
-		const cestMinute = cestDate.getMinutes().toString();
-		console.log(cestHour, cestMinute);
+	$: if (parseInt(hour) > 12) {
+		hour = '12';
+	}
+	$: if (parseInt(minute) > 59) {
+		minute = '59';
+	}
+	$: if (parseInt(hour) < 0) {
+		hour = '0';
+	}
+	$: if (parseInt(minute) < 0) {
+		minute = '0';
 	}
 </script>
 
