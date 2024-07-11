@@ -25,8 +25,8 @@
 		}
 		try {
 			const cestDate = transformLocalToCEST(hour, minute, format);
-			const cestHour = cestDate.getHours().toString();
-			const cestMinute = cestDate.getMinutes().toString();
+			const cestHour = cestDate.getHours();
+			const cestMinute = cestDate.getMinutes();
 
 			const execution = await functions.createExecution(
 				'api',

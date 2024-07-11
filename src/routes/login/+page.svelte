@@ -10,8 +10,10 @@
 
 	let email = '';
 	let password = '';
+	let disabled = false;
 
 	async function handleSubmit() {
+		disabled = true;
 		try {
 			await account.createEmailPasswordSession(email, password);
 			await goto('/dashboard');
@@ -19,6 +21,8 @@
 			const message = (error as Error)?.message ?? error;
 			toast(message);
 			console.log(error);
+		} finally {
+			disabled = false;
 		}
 	}
 
@@ -68,7 +72,7 @@
 				bind:value={password}
 			/>
 		</div>
-		<Button type="submit" class="w-full">Sign in</Button>
+		<Button type="submit" class="w-full" {disabled}>Sign in</Button>
 		<div class=" grid grid-cols-3 items-center">
 			<Separator />
 			<p class="text-center text-sm text-muted-foreground">or</p>
