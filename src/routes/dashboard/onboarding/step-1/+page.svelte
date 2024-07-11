@@ -10,6 +10,7 @@
 	import { goto } from '$app/navigation';
 	import { ID } from 'appwrite';
 	import { user } from '$lib/stores';
+	import { CalColors, colorToHex } from '$lib/calendars';
 
 	let selectedProvider: 'google' | 'apple' | 'outlook' | 'url' | null = null;
 	let name = '';
@@ -17,7 +18,6 @@
 	let color = '';
 	let form: HTMLFormElement;
 
-	const colors = ['#FD366E', '#FE9567', '#7C67FE', '#85DBD8', '#68A3FE', '#FED367'];
 	onMount(() => {
 		step.set(1);
 	});
@@ -297,14 +297,17 @@
 			<div class="grid gap-2">
 				<Label for="url">Calendar color</Label>
 				<div class="flex gap-2">
-					{#each colors as c}
+					{#each CalColors as c}
 						<button
 							type="button"
 							class={`border-separate rounded-full border text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:border-primary `}
 							disabled={color === c}
 							on:click={() => (color = c)}
 						>
-							<div class="m-1 h-10 w-10 rounded-full" style={`background-color: ${c}`}></div>
+							<div
+								class="m-1 h-10 w-10 rounded-full"
+								style={`background-color: ${colorToHex(c)}`}
+							/>
 						</button>
 					{/each}
 				</div>

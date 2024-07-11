@@ -6,6 +6,7 @@
 	import { toLocaleTimeISO } from '$lib/utils';
 	import EmptyCard from './emptyCard.svelte';
 	import type { CalEvent } from '$lib/calendars';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	export let data;
 
@@ -55,7 +56,7 @@
 	<title>Dashboard - MailMemo</title>
 </svelte:head>
 
-<div class=" mt-12 h-full w-full max-w-[750px]">
+<div class="mt-12 h-full w-full max-w-[750px] pb-16 lg:pb-0">
 	<div class="flex w-full items-center justify-between">
 		<div class="flex flex-col">
 			<p class="text-xl">Hello</p>
@@ -155,4 +156,11 @@
 			<EmptyCard />
 		{/if}
 	</div>
+</div>
+
+<div
+	class="fixed bottom-0 flex w-full max-w-[750px] justify-between gap-4 px-5 py-8 lg:relative lg:px-0"
+>
+	<Button variant="outline" class="w-full lg:w-auto">Sync calendars</Button>
+	<Button class="w-full lg:w-auto">Send Email</Button>
 </div>

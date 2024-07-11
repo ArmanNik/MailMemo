@@ -1,12 +1,12 @@
 <div class="mm-container flex h-full min-h-[100vh] w-full flex-col px-8 lg:grid lg:grid-cols-2">
 	<div class="hidden bg-muted lg:block">
-		<img
+		<!-- <img
 			src="/images/placeholder.svg"
 			alt="placeholder"
 			width="1920"
 			height="1080"
 			class="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-		/>
+		/> -->
 	</div>
 	<div class="mt-8 block text-center lg:hidden"><img src="/logotype.svg" alt="" /></div>
 	<div class="flex h-full grow flex-col items-center justify-between py-8">

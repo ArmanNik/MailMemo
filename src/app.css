@@ -85,15 +85,6 @@
   opacity: 0.3;
   background: radial-gradient(49.55% 43.54% at 47% 50.69%, #cbc2ff 32%, #7c67fe 100%);
   filter: blur(150px);
+  z-index: -1;
 }
 
-.mm-gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  border-radius: 588px;
-  opacity: 0.3;
-  background: radial-gradient(49.55% 43.54% at 47% 50.69%, #cbc2ff 32%, #7c67fe 100%);
-  filter: blur(150px);
-}
