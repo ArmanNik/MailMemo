@@ -33,12 +33,7 @@ Sample `200` Response:
 
 ## ⚙️ Configuration
 
-| Setting           | Value         |
-| ----------------- | ------------- |
-| Runtime           | Go (1.22)     |
-| Entrypoint        | `main.go`     |
-| Permissions       | `any`         |
-| Timeout (Seconds) | 15            |
+All settings of a function can be found in `appwrite.json` file in root of this repository.
 
 ## 🔒 Environment Variables
 
