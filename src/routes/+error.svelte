@@ -2,7 +2,9 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 
-	onMount(()
+	onMount(() => {
+		console.log('test');
+	});
 </script>
 
 <h1>{$page?.error?.message}</h1>
