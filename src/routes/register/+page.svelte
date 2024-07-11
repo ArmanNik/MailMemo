@@ -25,8 +25,8 @@
 		try {
 			account.createOAuth2Session(
 				OAuthProvider.Github, // provider
-				'https://mail-memo.vercel.app/dashboard', // redirect here on success
-				'https://mail-memo.vercel.app/login', // redirect here on failure
+				'https://app.mailmemo.site/dashboard', // redirect here on success
+				'https://app.mailmemo.site/login', // redirect here on failure
 				['repo', 'user']
 			);
 		} catch (error) {
@@ -82,9 +82,10 @@
 			<Separator />
 		</div>
 
-		<Button variant="outline" class="frosted w-full" on:click={handleGitHubLogin}
-			>Login with GitHub</Button
-		>
+		<Button variant="outline" class="frosted w-full" on:click={handleGitHubLogin}>
+			<img src="/icons/github.svg" alt="github" />
+			<span class="ml-2"> Login with GitHub </span>
+		</Button>
 	</form>
 	<svelte:fragment slot="footer">
 		Already have an account?

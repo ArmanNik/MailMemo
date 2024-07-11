@@ -70,9 +70,10 @@
 			<Separator />
 		</div>
 
-		<Button variant="outline" class="frosted w-full" on:click={handleGitHubLogin}
-			>Login with GitHub</Button
-		>
+		<Button variant="outline" class="frosted w-full" on:click={handleGitHubLogin}>
+			<img src="/icons/github.svg" alt="github" />
+			<span class="ml-2"> Login with GitHub </span>
+		</Button>
 	</form>
 
 	<svelte:fragment slot="footer">
