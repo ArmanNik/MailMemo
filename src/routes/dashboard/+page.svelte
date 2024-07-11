@@ -70,7 +70,7 @@
 
 	async function sendEmail() {
 		const execution = await functions.createExecution(
-			'sendEmail',
+			'sendMails',
 			'',
 			false,
 			'/v1/scheduler/intervals',
