@@ -79,7 +79,6 @@ func Main(Context *types.Context) types.ResponseOutput {
 	if timezoneErr != nil {
 		Context.Error(timezoneErr)
 		return Context.Res.Text("Error", 500, nil)
-
 	}
 
 	calResp, err := http.Get(calendarUrl)
@@ -108,7 +107,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	i := 0
 	for _, e := range c.Events {
 		eventChunk[i] = EventMinimal{
-			Uid:          e.Uid,
+			Uid:          e.Uid + e.Start.Format(time.RFC3339),
 			Summary:      e.Summary,
 			Start:        e.Start,
 			End:          e.End,
@@ -174,7 +173,8 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 			found := false
 			for _, e := range c.Events {
-				if e.Uid == uid {
+				eventUid := e.Uid + e.Start.Format(time.RFC3339)
+				if eventUid == uid {
 					found = true
 					break
 				}
@@ -241,10 +241,9 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 
 		var existingEventDocument map[string]interface{} = nil
 
-		eventId := event.Uid
 		for _, document := range eventsResponse.Documents {
 			eventDocument := document.(map[string]interface{})
-			if eventDocument["uid"].(string) == eventId {
+			if eventDocument["uid"].(string) == event.Uid {
 				existingEventDocument = eventDocument
 			}
 		}

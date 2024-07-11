@@ -47,11 +47,10 @@ func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.
 	defer calResp.Body.Close()
 
 	start := time.Now()
-	end := time.Now().AddDate(0, 0, 1)
+	end := time.Now().AddDate(10, 0, 0)
 
 	c := gocal.NewParser(calResp.Body)
-	c.Start = &start
-	c.End = &end
+	c.Start, c.End = &start, &end
 	parseErr := c.Parse()
 	if parseErr != nil {
 		Context.Error(parseErr)

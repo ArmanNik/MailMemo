@@ -283,7 +283,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 		</mj-section>
 	`
 
-	if len(mailData.Today) > 0 {
+	if len(mailData.UpcommingOrder) > 0 {
 		UpcomingHtmlElements := []string{}
 
 		for _, dayKey := range mailData.UpcommingOrder {
