@@ -10,8 +10,12 @@
 	import { functions } from '$lib/sdk';
 	import { ExecutionMethod } from 'appwrite';
 	import { toast } from 'svelte-sonner';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	export let data;
+
+	let syncButtonDisabled = false;
+	let sendEmailButtonDisabled = false;
 
 	function evaluateCornerRadius(index: number, lenght: number) {
 		if (lenght === 1) {
@@ -51,6 +55,7 @@
 	}
 
 	async function syncCalendars() {
+		syncButtonDisabled = true;
 		try {
 			const execution = await functions.createExecution(
 				'syncCalendarScheduler',
@@ -69,10 +74,13 @@
 			}
 		} catch (error) {
 			toast(error as string);
+		} finally {
+			syncButtonDisabled = false;
 		}
 	}
 
 	async function sendEmail() {
+		sendEmailButtonDisabled = true;
 		try {
 			const execution = await functions.createExecution(
 				'sendMails',
@@ -91,6 +99,8 @@
 			}
 		} catch (error) {
 			toast(error as string);
+		} finally {
+			sendEmailButtonDisabled = false;
 		}
 	}
 
@@ -143,13 +153,13 @@
 					<p class="ml-2">{calendar.name}</p>
 				</Badge>
 			{/each}
-			<button type="button" on:click={() => toast('test')}>
-				<Badge variant="outline">
-					+
-					<p class="ml-2">Add calendar</p>
-				</Badge>
-			</button>
 		{/if}
+		<button type="button" on:click={() => toast('test')}>
+			<Badge variant="outline">
+				+
+				<p class="ml-2">Add calendar</p>
+			</Badge>
+		</button>
 	</div>
 	<Separator class="mt-5" />
 	<h1 class="font-header mt-6 text-xl">Today</h1>
@@ -239,7 +249,16 @@
 <div
 	class="fixed bottom-0 flex w-full max-w-[750px] justify-between gap-4 px-5 py-8 lg:relative lg:px-0"
 >
-	<Button variant="outline" class="w-full lg:w-auto" on:click={syncCalendars}>Sync calendars</Button
+	<Button
+		variant="outline"
+		class="w-full lg:w-auto"
+		on:click={syncCalendars}
+		disabled={syncButtonDisabled}>Sync calendars</Button
 	>
-	<Button class="w-full lg:w-auto" on:click={sendEmail}>Send email</Button>
+	<Button class="w-full lg:w-auto" on:click={sendEmail} disabled={sendEmailButtonDisabled}>
+		{#if sendEmailButtonDisabled}
+			<LoaderCircle class="h-6 w-6" />
+		{/if}
+		Send email
+	</Button>
 </div>
