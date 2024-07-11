@@ -20,8 +20,8 @@
 <div class="mt-12 h-full w-full max-w-[750px] pb-16 lg:pb-0">
 	<div class="flex w-full justify-between">
 		<div class="flex flex-col">
-			<p class="font-header text-xl">Hello</p>
-			<h3 class="font-header text-2xl">
+			<p class="font-header text-xl font-light">Hello</p>
+			<h3 class="font-header text-3xl tracking-tight">
 				{$user?.name}
 			</h3>
 		</div>
@@ -30,7 +30,7 @@
 		src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXB1c25iZTU3cTJjYWZvdjdldWRyOWt3ZTJ0cGQ2Mm8xZm5lZzRpbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/B9TcUZLrpj9KFD5cLw/giphy.webp"
 		alt=""
 	/>
-	<a href="/dashboard" class="underline">Go back</a>
+	<a href="/dashboard" class="mt-2 underline">Go back</a>
 </div>
 
 <div class="flex w-full justify-end">
