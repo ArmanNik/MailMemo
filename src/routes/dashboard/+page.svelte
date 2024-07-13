@@ -255,7 +255,7 @@
 </div>
 
 <div
-	class=" mm-backdrop fixed bottom-0 flex w-full max-w-[500px] justify-between gap-4 px-5 py-8 lg:relative lg:px-0"
+	class=" mm-backdrop fixed bottom-0 flex w-full max-w-[500px] justify-between gap-4 px-5 py-8"
 >
 	<Button
 		variant="outline"
@@ -279,8 +279,5 @@
 <style>
 	.mm-backdrop {
 		background: linear-gradient(180deg, rgba(255, 255, 255, 0) 10%, black 100%);
-		@media (min-width: 1024px) {
-			background: transparent;
-		}
 	}
 </style>
