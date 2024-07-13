@@ -44,19 +44,16 @@
 		try {
 			await account.updatePrefs({
 				...$user.prefs,
-				...$preferences,
-				frequency,
-				frequencyDetails,
+				period: $preferences.period,
+				timezone: $preferences.timezone,
 				onboarded: true
 			});
 
-			const cestDate = transformLocalToCEST(
+			const { hour: cestHour, minute: cestMinute } = transformLocalToUTC(
 				$preferences.hour,
 				$preferences.minute,
 				$preferences.format
 			);
-			const cestHour = cestDate.getHours();
-			const cestMinute = cestDate.getMinutes();
 
 			const execution = await functions.createExecution(
 				'api',
@@ -83,19 +80,30 @@
 			}
 		} catch (error) {
 			toast(error as string);
-			console.log(error);
 		}
 	}
 
-	function transformLocalToCEST(hour: string, minute: string, format: string) {
+	function transformLocalToUTC(hour: string, minute: string, format: string) {
 		const intHour = format === 'PM' ? parseInt(hour) + 12 : parseInt(hour);
-		const date = new Date();
-		date.setHours(intHour);
-		date.setMinutes(parseInt(minute));
-		date.setSeconds(0);
-		date.setMilliseconds(0);
-		const cestDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
-		return cestDate;
+
+		const localDate = new Date();
+		localDate.setHours(intHour);
+		localDate.setMinutes(parseInt(minute));
+		localDate.setSeconds(0);
+		localDate.setMilliseconds(0);
+
+		const utcVerbose = localDate.toUTCString();
+		const utcDate = new Date(utcVerbose);
+		const utcIso = utcDate.toISOString();
+
+		const utcTime = utcIso.split("T")[1] ?? '';
+		const utcHour = utcTime.split(":")[0] ?? '';
+		const utcMinutes = utcTime.split(":")[1] ?? '';
+
+		return {
+			hour: parseInt(utcHour),
+			minute: parseInt(utcMinutes)
+		}
 	}
 </script>
 
