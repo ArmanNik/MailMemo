@@ -102,7 +102,7 @@
             "runtime": "go-1.22",
             "execute": [],
             "events": [],
-            "schedule": "",
+            "schedule": "* * * * *",
             "timeout": 15,
             "enabled": true,
             "logging": true,
@@ -141,7 +141,9 @@
             "runtime": "node-18.0",
             "execute": [],
             "events": [],
-            "scopes": ["messages.write"],
+            "scopes": [
+                "messages.write"
+            ],
             "schedule": "",
             "timeout": 30,
             "enabled": true,

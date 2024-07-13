@@ -86,10 +86,27 @@ func Main(Context *types.Context) types.ResponseOutput {
 		}
 
 		var wg sync.WaitGroup
-		wg.Add(len(listResponse.Users))
 		errCh := make(chan error, len(listResponse.Users))
 
 		for _, user := range listResponse.Users {
+			userStruct := user.(map[string]interface{})
+			userLabels := userStruct["labels"].([]interface{})
+			userLabel := userLabels[0].(string)
+
+			hasLabel := false
+
+			for _, currentDate := range currentDateStrings {
+				if userLabel == currentDate {
+					hasLabel = true
+					break
+				}
+			}
+
+			if !hasLabel {
+				continue
+			}
+
+			wg.Add(1)
 			go func(u interface{}) {
 				defer wg.Done()
 
