@@ -32,10 +32,10 @@
 
 	async function handleGitHubLogin() {
 		try {
-			account.createOAuth2Session(
+			account.createOAuth2Token(
 				OAuthProvider.Github, // provider
-				'https://app.mailmemo.site/dashboard', // redirect here on success
-				'https://app.mailmemo.site/login', // redirect here on failure
+				window.location.origin + '/dashboard', // redirect here on success
+				window.location.origin + '/login', // redirect here on failure
 				['repo', 'user']
 			);
 		} catch (error) {

@@ -28,10 +28,10 @@
 
 	async function handleGitHubLogin() {
 		try {
-			account.createOAuth2Session(
+			account.createOAuth2Token(
 				OAuthProvider.Github, // provider
-				'https://mail-memo.vercel.app/dashboard', // redirect here on success
-				'https://mail-memo.vercel.app/login', // redirect here on failure
+				window.location.origin + '/dashboard', // redirect here on success
+				window.location.origin + '/login', // redirect here on failure
 				['repo', 'user']
 			);
 		} catch (error) {

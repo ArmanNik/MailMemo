@@ -40,9 +40,7 @@
             "$id": "sendMails",
             "name": "sendMails",
             "runtime": "go-1.22",
-            "execute": [
-                "users"
-            ],
+            "execute": ["users"],
             "events": [],
             "schedule": "",
             "timeout": 60,
@@ -51,11 +49,7 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMails",
-            "scopes": [
-                "users.read",
-                "documents.read",
-                "execution.write"
-            ]
+            "scopes": ["users.read", "documents.read", "execution.write"]
         },
         {
             "$id": "syncCalendar",
@@ -70,19 +64,13 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/syncCalendar",
-            "scopes": [
-                "documents.read",
-                "documents.write",
-                "users.read"
-            ]
+            "scopes": ["documents.read", "documents.write", "users.read"]
         },
         {
             "$id": "syncCalendarScheduler",
             "name": "syncCalendarScheduler",
             "runtime": "go-1.22",
-            "execute": [
-                "users"
-            ],
+            "execute": ["users"],
             "events": [],
             "schedule": "*/15 * * * *",
             "timeout": 900,
@@ -91,10 +79,7 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/syncCalendarScheduler",
-            "scopes": [
-                "documents.read",
-                "execution.write"
-            ]
+            "scopes": ["documents.read", "execution.write"]
         },
         {
             "$id": "sendMailsScheduler",
@@ -109,23 +94,14 @@
             "entrypoint": "main.go",
             "commands": "",
             "path": "functions/sendMailsScheduler",
-            "scopes": [
-                "users.read",
-                "execution.write"
-            ]
+            "scopes": ["users.read", "execution.write"]
         },
         {
             "$id": "api",
             "name": "api",
             "runtime": "go-1.22",
-            "execute": [
-                "users"
-            ],
-            "scopes": [
-                "users.write",
-                "documents.write",
-                "users.read"
-            ],
+            "execute": ["users"],
+            "scopes": ["users.write", "documents.write", "users.read"],
             "events": [],
             "schedule": "",
             "timeout": 15,
@@ -141,9 +117,7 @@
             "runtime": "node-18.0",
             "execute": [],
             "events": [],
-            "scopes": [
-                "messages.write"
-            ],
+            "scopes": ["messages.write"],
             "schedule": "",
             "timeout": 30,
             "enabled": true,
@@ -163,9 +137,7 @@
     "collections": [
         {
             "$id": "calendars",
-            "$permissions": [
-                "create(\"users\")"
-            ],
+            "$permissions": ["create(\"users\")"],
             "databaseId": "main",
             "name": "calendars",
             "enabled": true,
@@ -209,25 +181,15 @@
                     "key": "index_1",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "userId"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["userId"],
+                    "orders": ["ASC"]
                 },
                 {
                     "key": "index_2",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "userId",
-                        "$id"
-                    ],
-                    "orders": [
-                        "ASC",
-                        "ASC"
-                    ]
+                    "attributes": ["userId", "$id"],
+                    "orders": ["ASC", "ASC"]
                 }
             ]
         },
@@ -293,40 +255,22 @@
                     "key": "index_1",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "calendarId"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["calendarId"],
+                    "orders": ["ASC"]
                 },
                 {
                     "key": "index_2",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "calendarId",
-                        "startAt",
-                        "endAt"
-                    ],
-                    "orders": [
-                        "ASC",
-                        "ASC",
-                        "ASC"
-                    ]
+                    "attributes": ["calendarId", "startAt", "endAt"],
+                    "orders": ["ASC", "ASC", "ASC"]
                 },
                 {
                     "key": "index_3",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "calendarId",
-                        "uid"
-                    ],
-                    "orders": [
-                        "ASC",
-                        "ASC"
-                    ]
+                    "attributes": ["calendarId", "uid"],
+                    "orders": ["ASC", "ASC"]
                 }
             ]
         }
@@ -334,18 +278,12 @@
     "buckets": [
         {
             "$id": "email-assets",
-            "$permissions": [
-                "read(\"any\")"
-            ],
+            "$permissions": ["read(\"any\")"],
             "fileSecurity": false,
             "name": "Email assets",
             "enabled": true,
             "maximumFileSize": 5000000,
-            "allowedFileExtensions": [
-                "png",
-                "jpg",
-                "gif"
-            ],
+            "allowedFileExtensions": ["png", "jpg", "gif"],
             "compression": "none",
             "encryption": true,
             "antivirus": true
