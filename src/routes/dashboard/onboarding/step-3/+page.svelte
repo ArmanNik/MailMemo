@@ -6,7 +6,7 @@
 	import { goto } from '$app/navigation';
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 
-	let period: 'today' | 'week' | 'month' | 'year' = 'year';
+	let period: 'today' | 'week' | 'month' | 'months' | 'year' = 'year';
 	let form: HTMLFormElement;
 
 	onMount(() => {
@@ -48,6 +48,10 @@
 				<div class="flex items-center space-x-2 px-1 py-2">
 					<RadioGroup.Item value="month" id="month" />
 					<Label for="month">This month</Label>
+				</div>
+				<div class="flex items-center space-x-2 px-1 py-2">
+					<RadioGroup.Item value="months" id="months" />
+					<Label for="months">Next 3 months</Label>
 				</div>
 				<div class="flex items-center space-x-2 px-1 py-2">
 					<RadioGroup.Item value="year" id="year" />

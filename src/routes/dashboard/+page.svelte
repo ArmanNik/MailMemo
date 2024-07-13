@@ -11,6 +11,8 @@
 	import { ExecutionMethod } from 'appwrite';
 	import { toast } from 'svelte-sonner';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
+	import { invalidate } from '$app/navigation';
+	import { Dependencies } from '$lib/costants';
 
 	export let data;
 
@@ -72,6 +74,8 @@
 				);
 				return;
 			}
+			toast('Calendars synced successfully 🚀');
+			await invalidate(Dependencies.DOCUMENTS);
 		} catch (error) {
 			toast(error as string);
 		} finally {
@@ -134,7 +138,7 @@
 	<title>Dashboard - MailMemo</title>
 </svelte:head>
 
-<div class=" h-full w-full max-w-[750px] pb-16 lg:pb-0">
+<div class=" h-full w-full max-w-[500px] pb-16 lg:pb-0">
 	<div class="flex w-full justify-between">
 		<div class="flex flex-col gap-2">
 			<p class="font-header text-xl font-light">Hello</p>
@@ -251,13 +255,18 @@
 </div>
 
 <div
-	class=" mm-backdrop fixed bottom-0 flex w-full max-w-[750px] justify-between gap-4 px-5 py-8 lg:relative lg:px-0"
+	class=" mm-backdrop fixed bottom-0 flex w-full max-w-[500px] justify-between gap-4 px-5 py-8 lg:relative lg:px-0"
 >
 	<Button
 		variant="outline"
 		class="w-full lg:w-auto"
 		on:click={syncCalendars}
-		disabled={syncButtonDisabled}>Sync calendars</Button
+		disabled={syncButtonDisabled}>
+		{#if syncButtonDisabled}
+			<LoaderCircle class="h-6 w-6 animate-spin" />
+		{/if}
+		<span class="ml-2">Sync calendars</span>
+	</Button
 	>
 	<Button class="w-full lg:w-auto" on:click={sendEmail} disabled={sendEmailButtonDisabled}>
 		{#if sendEmailButtonDisabled}

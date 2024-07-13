@@ -108,6 +108,8 @@ func Main(Context *types.Context) types.ResponseOutput {
 		endAt = endAt.Add(7 * 24 * time.Hour)
 	} else if periodString == "month" {
 		endAt = endAt.Add(30 * 24 * time.Hour)
+	} else if periodString == "months" {
+		endAt = endAt.Add(3 * 30 * 24 * time.Hour)
 	} else if periodString == "year" {
 		endAt = endAt.Add(365 * 24 * time.Hour)
 	}

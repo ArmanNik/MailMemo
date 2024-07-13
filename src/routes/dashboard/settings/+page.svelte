@@ -17,7 +17,7 @@
 	<title>Settings - MailMemo</title>
 </svelte:head>
 
-<div class="mt-12 h-full w-full max-w-[750px] pb-16 lg:pb-0">
+<div class="mt-12 h-full w-full max-w-[500px] pb-16 lg:pb-0">
 	<div class="flex w-full justify-between">
 		<div class="flex flex-col">
 			<p class="font-header text-xl font-light">Hello</p>
@@ -35,7 +35,7 @@
 	</div>
 </div>
 
-<div class="flex w-full max-w-[750px] justify-between">
+<div class="flex w-full max-w-[500px] justify-between">
 	<Button variant="outline">
 		<a href="/dashboard"> Go back </a>
 	</Button>
