@@ -22,7 +22,7 @@ type UserWithPrefs struct {
 }
 
 // TODO: Security: Use encrypted email values
-func DeleteSubscription(ontext types.Context, client appwrite.Client) types.ResponseOutput {
+func DeleteSubscription(ontext openRuntimes.Context, client appwrite.Client) openRuntimes.ResponseOutput {
 	var body DeleteSubscriptionBody
 	err := context.Req.BodyJson(&body)
 	if err != nil {

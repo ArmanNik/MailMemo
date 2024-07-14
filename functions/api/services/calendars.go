@@ -10,7 +10,6 @@ import (
 	"github.com/appwrite/sdk-for-go/id"
 	"github.com/appwrite/sdk-for-go/permission"
 	"github.com/appwrite/sdk-for-go/role"
-	"github.com/open-runtimes/types-for-go/v4"
 )
 
 type CreateCalendarBody struct {
@@ -19,7 +18,7 @@ type CreateCalendarBody struct {
 	Color string `json:"color"`
 }
 
-func CreateCalendar(context types.Context, client appwrite.Client) types.ResponseOutput {
+func CreateCalendar(context openRuntimes.Context, client appwrite.Client) openRuntimes.ResponseOutput {
 	var body CreateCalendarBody
 	err := context.Req.BodyJson(&body)
 	if err != nil {

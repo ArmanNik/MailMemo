@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/appwrite/sdk-for-go/appwrite"
-	"github.com/open-runtimes/types-for-go/v4"
 )
 
 type UpdateSchedulerIntervalBody struct {
@@ -15,7 +14,7 @@ type UpdateSchedulerIntervalBody struct {
 	FrequencyDetails string `json:"frequencyDetails"`
 }
 
-func UpdateSchedulerInterval(context types.Context, client appwrite.Client) types.ResponseOutput {
+func UpdateSchedulerInterval(context openRuntimes.Context, client appwrite.Client) openRuntimes.ResponseOutput {
 	var body UpdateSchedulerIntervalBody
 	err := context.Req.BodyJson(&body)
 	if err != nil {

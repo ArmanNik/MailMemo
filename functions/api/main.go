@@ -5,10 +5,9 @@ import (
 	"os"
 
 	"github.com/appwrite/sdk-for-go/appwrite"
-	"github.com/open-runtimes/types-for-go/v4"
 )
 
-func Main(context types.Context) types.ResponseOutput {
+func Main(context openRuntimes.Context) openRuntimes.ResponseOutput {
 	client := appwrite.NewClient(
 		appwrite.WithEndpoint(os.Getenv("APPWRITE_API_ENDPOINT")),
 		appwrite.WithProject(os.Getenv("APPWRITE_PROJECT_ID")),
