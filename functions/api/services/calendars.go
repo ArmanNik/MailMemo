@@ -1,14 +1,12 @@
 package services
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/apognu/gocal"
-	"github.com/appwrite/sdk-for-go/client"
-	"github.com/appwrite/sdk-for-go/databases"
+	"github.com/appwrite/sdk-for-go/appwrite"
 	"github.com/appwrite/sdk-for-go/id"
 	"github.com/appwrite/sdk-for-go/permission"
 	"github.com/appwrite/sdk-for-go/role"
@@ -21,11 +19,11 @@ type CreateCalendarBody struct {
 	Color string `json:"color"`
 }
 
-func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.ResponseOutput {
+func CreateCalendar(context types.Context, client appwrite.Client) types.ResponseOutput {
 	var body CreateCalendarBody
-	err := json.Unmarshal(Context.Req.BodyBinary(), &body)
+	err := context.Req.BodyJson(&body)
 	if err != nil {
-		return Context.Res.Text("Invalid body.", 400, nil)
+		return context.Res.Text("Invalid body.", context.Res.WithStatusCode(400))
 	}
 
 	// Transformers
@@ -35,13 +33,13 @@ func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.
 
 	// Validators
 	if body.Color != "pink" && body.Color != "orange" && body.Color != "blue" && body.Color != "yellow" && body.Color != "purple" && body.Color != "mint" {
-		return Context.Res.Text("Color must be 'pink' or 'orange' or 'blue' or 'yellow' or 'purple'", 400, nil)
+		return context.Res.Text("Color must be 'pink' or 'orange' or 'blue' or 'yellow' or 'purple'", context.Res.WithStatusCode(400))
 	}
 
 	calResp, err := http.Get(body.Url)
 	if err != nil {
-		Context.Error(err)
-		return Context.Res.Text("Calendar URL is not valid", 400, nil)
+		context.Error(err)
+		return context.Res.Text("Calendar URL is not valid", context.Res.WithStatusCode(400))
 	}
 
 	defer calResp.Body.Close()
@@ -53,35 +51,35 @@ func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.
 	c.Start, c.End = &start, &end
 	parseErr := c.Parse()
 	if parseErr != nil {
-		Context.Error(parseErr)
-		return Context.Res.Text("URL is not a valid calendar", 400, nil)
+		context.Error(parseErr)
+		return context.Res.Text("URL is not a valid calendar", context.Res.WithStatusCode(400))
 	}
 
 	if len(c.Events) == 0 {
-		Context.Error("No events found")
-		return Context.Res.Text("URL is not a valid calendar", 400, nil)
+		context.Error("No events found")
+		return context.Res.Text("URL is not a valid calendar", context.Res.WithStatusCode(400))
 	}
 
 	// Ensure it's user-executed
-	userId, userIdOk := Context.Req.Headers["x-appwrite-user-id"]
+	userId, userIdOk := context.Req.Headers["x-appwrite-user-id"]
 	if !userIdOk || userId == "" {
-		return Context.Res.Text("Unauthorized", 401, nil)
+		return context.Res.Text("Unauthorized", context.Res.WithStatusCode(401))
 	}
 
 	// Action
-	appwriteDatabase := databases.NewDatabases(appwriteClient)
-	_, err = appwriteDatabase.CreateDocument("main", "calendars", id.Unique(), map[string]interface{}{
+	databases := appwrite.NewDatabases(client)
+	_, err = databases.CreateDocument("main", "calendars", id.Unique(), map[string]interface{}{
 		"url":    body.Url,
 		"name":   body.Name,
 		"color":  body.Color,
 		"userId": userId,
-	}, databases.WithCreateDocumentPermissions([]interface{}{
+	}, databases.WithCreateDocumentPermissions([]string{
 		permission.Read(role.User(userId, "")),
 	}))
 
 	if err != nil {
-		return Context.Res.Text(err.Error(), 400, nil)
+		return context.Res.Text(err.Error(), context.Res.WithStatusCode(400))
 	}
 
-	return Context.Res.Text("OK", 200, nil)
+	return context.Res.Text("OK")
 }

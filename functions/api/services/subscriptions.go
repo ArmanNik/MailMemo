@@ -3,9 +3,8 @@ package services
 import (
 	"encoding/json"
 
-	"github.com/appwrite/sdk-for-go/client"
+	"github.com/appwrite/sdk-for-go/appwrite"
 	"github.com/appwrite/sdk-for-go/query"
-	"github.com/appwrite/sdk-for-go/users"
 	"github.com/open-runtimes/types-for-go/v4"
 )
 
@@ -13,40 +12,49 @@ type DeleteSubscriptionBody struct {
 	Email string `json:"email"`
 }
 
+type UserPrefs struct {
+	Subscribed bool `json:"subscribed"`
+}
+
+type UserWithPrefs struct {
+	*appwrite.models.User
+	Prefs UserPrefs
+}
+
 // TODO: Security: Use encrypted email values
-func DeleteSubscription(Context *types.Context, appwriteClient client.Client) types.ResponseOutput {
+func DeleteSubscription(ontext types.Context, client appwrite.Client) types.ResponseOutput {
 	var body DeleteSubscriptionBody
-	err := json.Unmarshal(Context.Req.BodyBinary(), &body)
+	err := context.Req.BodyJson(&body)
 	if err != nil {
-		return Context.Res.Text("Invalid body.", 400, nil)
+		return context.Res.Text("Invalid body.", context.Res.WithStatusCode(400))
 	}
 
 	// Action
-	appwriteUsers := users.NewUsers(appwriteClient)
+	users := appwrite.NewUsers(client)
 
-	users, userErr := appwriteUsers.List(users.WithListQueries([]interface{}{
+	response, userErr := users.List[UserWithPrefs](users.WithListQueries([]string{
 		query.Equal("email", body.Email),
 		query.Limit(1),
 	}))
 
 	if userErr != nil {
-		return Context.Res.Text(userErr.Error(), 400, nil)
+		return context.Res.Text(userErr.Error(), context.Res.WithStatusCode(400))
 	}
 
 	// Return OK here to prevent account existance exposure
-	if len(users.Users) == 0 {
-		return Context.Res.Text("OK", 200, nil)
+	if len(response.Users) == 0 {
+		return context.Res.Text("OK")
 	}
 
-	currentUser := users.Users[0].(map[string]interface{})
-	currentPrefs := currentUser["prefs"].(map[string]interface{})
+	currentUser := response.Users[0]
+	currentPrefs := currentUser["prefs"]
 
-	currentPrefs["unsubscribed"] = true
+	currentPrefs.Unsubscribed = true
 
-	_, err = appwriteUsers.UpdatePrefs(currentUser["$id"].(string), currentPrefs)
+	_, err = users.UpdatePrefs(currentUser.Id, currentPrefs)
 	if err != nil {
-		return Context.Res.Text("Could not mark as unsubscribed", 400, nil)
+		return context.Res.Text("Could not mark as unsubscribed", context.Res.WithStatusCode(400))
 	}
 
-	return Context.Res.Text("OK", 200, nil)
+	return context.Res.Text("OK")
 }
