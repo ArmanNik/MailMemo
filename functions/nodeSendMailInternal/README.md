@@ -43,4 +43,4 @@ Sample `200` Response:
 
 ## 🔒 Environment Variables
 
-No environment variables required.
+- `MAILGUN_API_KEY` - API Key from Mailgun Console

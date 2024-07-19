@@ -117,7 +117,7 @@
             "runtime": "node-18.0",
             "execute": [],
             "events": [],
-            "scopes": ["messages.write"],
+            "scopes": ["users.read"],
             "schedule": "",
             "timeout": 30,
             "enabled": true,

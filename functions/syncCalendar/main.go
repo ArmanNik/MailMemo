@@ -54,6 +54,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	}))
 
 	if err != nil {
+		Context.Error("Cannot get calendar:")
 		Context.Error(err)
 		return Context.Res.Text("Error", 500, nil)
 	}
@@ -69,6 +70,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	userStruct, userStructErr := appwriteUsers.Get(userId)
 	if userStructErr != nil {
+		Context.Error("Cannot get user:")
 		Context.Error(userStructErr)
 		return Context.Res.Text("Error", 500, nil)
 	}
@@ -77,12 +79,14 @@ func Main(Context *types.Context) types.ResponseOutput {
 	userTimezone, timezoneErr := time.LoadLocation(timezoneString)
 
 	if timezoneErr != nil {
+		Context.Error("Cannot load timezone:")
 		Context.Error(timezoneErr)
 		return Context.Res.Text("Error", 500, nil)
 	}
 
 	calResp, err := http.Get(calendarUrl)
 	if err != nil {
+		Context.Error("Cannot get calendar from URL:")
 		Context.Error(err)
 		return Context.Res.Text("Error", 500, nil)
 	}
@@ -102,7 +106,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	Context.Log("Processing")
 
-	eventChunk := [100]EventMinimal{}
+	eventChunk := [50]EventMinimal{}
 
 	i := 0
 	for _, e := range c.Events {
@@ -114,14 +118,15 @@ func Main(Context *types.Context) types.ResponseOutput {
 			LastModified: e.LastModified,
 		}
 
-		if i == 99 {
+		if i == 49 {
 			err = processEventsChunk(Context, userId, calendarId, appwriteDatabases, eventChunk)
 			if err != nil {
+				Context.Error("Cannot process chunk:")
 				Context.Error(err)
 				return Context.Res.Text("Error", 500, nil)
 			}
 
-			eventChunk = [100]EventMinimal{}
+			eventChunk = [50]EventMinimal{}
 			i = 0
 			continue
 		}
@@ -132,12 +137,13 @@ func Main(Context *types.Context) types.ResponseOutput {
 	if len(eventChunk) > 0 {
 		err = processEventsChunk(Context, userId, calendarId, appwriteDatabases, eventChunk)
 		if err != nil {
+			Context.Error("Cannot process final chunk:")
 			Context.Error(err)
 			return Context.Res.Text("Error", 500, nil)
 		}
 	}
 
-	eventChunk = [100]EventMinimal{}
+	eventChunk = [50]EventMinimal{}
 
 	cursor := "INIT"
 	for ok := true; ok; ok = (cursor != "") {
@@ -162,6 +168,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 		listResponse, listErr := appwriteDatabases.ListDocuments("main", "events", databases.WithListDocumentsQueries(queries))
 		if listErr != nil {
+			Context.Error("Cannot list documents during deletion:")
 			Context.Error(listErr)
 			return Context.Res.Text("Error", 500, nil)
 		}
@@ -185,6 +192,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 				_, err := appwriteDatabases.DeleteDocument("main", "events", id)
 				if err != nil {
+					Context.Error("Cannot delete event:")
 					Context.Error(err)
 					return Context.Res.Text("Error", 500, nil)
 				}
@@ -205,7 +213,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	return Context.Res.Text("OK", 200, nil)
 }
 
-func processEventsChunk(Context *types.Context, userId string, calendarId string, appwriteDatabases *databases.Databases, events [100]EventMinimal) error {
+func processEventsChunk(Context *types.Context, userId string, calendarId string, appwriteDatabases *databases.Databases, events [50]EventMinimal) error {
 	eventIds := []interface{}{}
 
 	for _, event := range events {
@@ -222,7 +230,7 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 
 	eventsResponse, err := appwriteDatabases.ListDocuments("main", "events", databases.WithListDocumentsQueries([]interface{}{
 		query.Equal("uid", eventIds),
-		query.Limit(100),
+		query.Limit(50),
 		query.Equal("calendarId", calendarId),
 		query.Select([]interface{}{"$id", "uid", "modifiedAt"}),
 	}))
@@ -232,7 +240,7 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 	}
 
 	var wg sync.WaitGroup
-	errCh := make(chan error, 100)
+	errCh := make(chan error, 50)
 
 	for _, event := range events {
 		if event.Uid == "" {

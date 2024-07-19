@@ -219,12 +219,10 @@ func Main(Context *types.Context) types.ResponseOutput {
 	previewText := strconv.Itoa(totalEventsInWeek) + " more in a week, and " + strconv.Itoa(totalEventsInMonth) + " more in a month... Today is:"
 
 	TodayHtml := `
-		<mj-section background-color="#272729" padding="1px" border-radius="16px 16px 16px 16px" css-class="small-wrapper">
-			<mj-column border-radius="16px 16px 16px 16px" background-color="#141416" padding="16px">
-			<mj-text font-size="18px" font-weight="400" color="#A1A1AA" padding="0px 0px 0px 0px" line-height="22px">
+		<mj-section padding="10px 0px 0px 0px" border-radius="16px 16px 16px 16px" css-class="small-wrapper">
+			<mj-text font-size="16px" font-weight="400" color="#707076" padding="0px 0px 0px 0px" line-height="22px">
 				No events to show
 			</mj-text>
-			</mj-column>
 		</mj-section>
 	`
 
@@ -253,7 +251,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 			}
 
 			TodayHtmlElements = append(TodayHtmlElements, `
-				<mj-section background-color="#272729" padding="1px" border-radius="`+borderRadius+`" css-class="small-wrapper">
+				<mj-section background-color="#a8a8a9" padding="1px" border-radius="`+borderRadius+`" css-class="small-wrapper">
 					<mj-column border-radius="`+borderRadius+`" background-color="#141416" padding="16px">
 					<mj-text font-weight="300" font-size="12px" color="#C3C3C6" padding="0px 0px 12px 0px">
 						`+event.Time+` &nbsp;&nbsp;<span style="color: #303031;">|</span>&nbsp;
@@ -276,12 +274,10 @@ func Main(Context *types.Context) types.ResponseOutput {
 	}
 
 	UpcomingHtml := `
-		<mj-section background-color="#272729" padding="1px" border-radius="16px 16px 16px 16px" css-class="small-wrapper">
-			<mj-column border-radius="16px 16px 16px 16px" background-color="#141416" padding="16px">
-			<mj-text font-size="18px" font-weight="400" color="#A1A1AA" padding="0px 0px 0px 0px" line-height="22px">
+		<mj-section padding="10px 0px 0px 0px" border-radius="16px 16px 16px 16px" css-class="small-wrapper">
+			<mj-text font-size="16px" font-weight="400" color="#707076" padding="0px 0px 0px 0px" line-height="22px">
 				No events to show
 			</mj-text>
-			</mj-column>
 		</mj-section>
 	`
 
@@ -348,12 +344,20 @@ func Main(Context *types.Context) types.ResponseOutput {
 				`
 			}
 
+			chipColor := "#18181B"
+			chipBgColor := "#FFFFFF"
+
+			if day.DaysRelative > 7 {
+				chipColor = "#707076"
+				chipBgColor = "#222224"
+			}
+
 			UpcomingHtmlElements = append(UpcomingHtmlElements, `
 				<mj-section background-color="#272729" padding="1px" border-radius="`+borderRadius+`" css-class="small-wrapper">
 					<mj-column border-radius="`+borderRadius+`" background-color="#141416" padding="16px">
 					
-					<mj-text font-size="13px" font-weight="500" color="#18181B" padding="4px 0px 18px 0px">
-						<span style="background-color: white; border-radius:25px; padding: 5px 8px;">&nbsp;In `+strconv.Itoa(day.DaysRelative)+` `+dayVerbose+`&nbsp;</span>
+					<mj-text font-size="13px" font-weight="500" color="`+chipColor+`" padding="4px 0px 18px 0px">
+						<span style="background-color: `+chipBgColor+`; border-radius:25px; padding: 5px 8px;">&nbsp;In `+strconv.Itoa(day.DaysRelative)+` `+dayVerbose+`&nbsp;</span>
 					</mj-text>
 					<mj-divider border-width="1px" padding="0px 0px 16px 0px" border-color="#222224" />
 					
@@ -403,7 +407,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 					` + TodayHtml + `
 
-					<mj-section padding="44px 0px 16px 0px" css-class="small-wrapper">
+					<mj-section padding="32px 0px 16px 0px" css-class="small-wrapper">
 						<mj-column padding="0px">
 							<mj-text font-size="18px" font-weight="400" color="#EDEDF0" padding="0px">
 								Upcoming Events&nbsp;
