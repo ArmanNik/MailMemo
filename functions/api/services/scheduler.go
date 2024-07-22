@@ -16,7 +16,7 @@ type UpdateSchedulerIntervalBody struct {
 	FrequencyDetails string `json:"frequencyDetails"`
 }
 
-func UpdateSchedulerInterval(Context *openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
+func UpdateSchedulerInterval(Context openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
 	var body UpdateSchedulerIntervalBody
 	err := Context.Req.BodyJson(&body)
 	if err != nil {

@@ -12,7 +12,7 @@ type DeleteSubscriptionBody struct {
 }
 
 // TODO: Security: Use encrypted email values
-func DeleteSubscription(Context *openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
+func DeleteSubscription(Context openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
 	var body DeleteSubscriptionBody
 	err := Context.Req.BodyJson(&body)
 	if err != nil {

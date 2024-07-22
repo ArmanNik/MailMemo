@@ -8,7 +8,7 @@ import (
 	openruntimes "github.com/open-runtimes/types-for-go/v4"
 )
 
-func Main(Context *openruntimes.Context) openruntimes.Response {
+func Main(Context openruntimes.Context) openruntimes.Response {
 	appwriteClient := client.NewClient()
 	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
 	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))

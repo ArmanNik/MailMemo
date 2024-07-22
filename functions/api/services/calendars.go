@@ -20,7 +20,7 @@ type CreateCalendarBody struct {
 	Color string `json:"color"`
 }
 
-func CreateCalendar(Context *openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
+func CreateCalendar(Context openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
 	var body CreateCalendarBody
 	err := Context.Req.BodyJson(&body)
 	if err != nil {
