@@ -427,9 +427,9 @@ func Main(Context *types.Context) types.ResponseOutput {
 					<mj-section padding-bottom="16px">
 						<mj-column>
 							<mj-text align="center" font-weight="300" font-size="14px" color="#C3C3C6" align="center" padding="0px">
-								<a href="https://app.mailmemo.site/" style="color: #C3C3C6; text-decoration: underline;">View in browser</a>
+								<a href="https://app.mailmemo.site/dashboard" style="color: #C3C3C6; text-decoration: underline;">View in browser</a>
 								<span style="color: #303031;">&nbsp;•&nbsp;</span>
-								<a href="https://app.mailmemo.site/settings" style="color: #C3C3C6; text-decoration: underline;">Email Preferences</a>
+								<a href="https://app.mailmemo.site/dashboard/settings" style="color: #C3C3C6; text-decoration: underline;">Email Preferences</a>
 								<span style="color: #303031;">&nbsp;•&nbsp;</span>
 								<a href="https://app.mailmemo.site/unsubscribe?email=` + userEmail + `" style="color: #C3C3C6; text-decoration: underline;">Unsubscribe</a>
 							</mj-text>
