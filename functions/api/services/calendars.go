@@ -1,7 +1,6 @@
 package services
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 	"time"
@@ -12,7 +11,7 @@ import (
 	"github.com/appwrite/sdk-for-go/id"
 	"github.com/appwrite/sdk-for-go/permission"
 	"github.com/appwrite/sdk-for-go/role"
-	"github.com/open-runtimes/types-for-go/v4"
+	openruntimes "github.com/open-runtimes/types-for-go/v4"
 )
 
 type CreateCalendarBody struct {
@@ -21,11 +20,11 @@ type CreateCalendarBody struct {
 	Color string `json:"color"`
 }
 
-func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.ResponseOutput {
+func CreateCalendar(Context *openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
 	var body CreateCalendarBody
-	err := json.Unmarshal(Context.Req.BodyBinary(), &body)
+	err := Context.Req.BodyJson(&body)
 	if err != nil {
-		return Context.Res.Text("Invalid body.", 400, nil)
+		return Context.Res.Text("Invalid body.", Context.Res.WithStatusCode(400))
 	}
 
 	// Transformers
@@ -35,13 +34,13 @@ func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.
 
 	// Validators
 	if body.Color != "pink" && body.Color != "orange" && body.Color != "blue" && body.Color != "yellow" && body.Color != "purple" && body.Color != "mint" {
-		return Context.Res.Text("Color must be 'pink' or 'orange' or 'blue' or 'yellow' or 'purple'", 400, nil)
+		return Context.Res.Text("Color must be 'pink' or 'orange' or 'blue' or 'yellow' or 'purple'", Context.Res.WithStatusCode(400))
 	}
 
 	calResp, err := http.Get(body.Url)
 	if err != nil {
 		Context.Error(err)
-		return Context.Res.Text("Calendar URL is not valid", 400, nil)
+		return Context.Res.Text("Calendar URL is not valid", Context.Res.WithStatusCode(400))
 	}
 
 	defer calResp.Body.Close()
@@ -54,18 +53,18 @@ func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.
 	parseErr := c.Parse()
 	if parseErr != nil {
 		Context.Error(parseErr)
-		return Context.Res.Text("URL is not a valid calendar", 400, nil)
+		return Context.Res.Text("URL is not a valid calendar", Context.Res.WithStatusCode(400))
 	}
 
 	if len(c.Events) == 0 {
 		Context.Error("No events found")
-		return Context.Res.Text("URL is not a valid calendar", 400, nil)
+		return Context.Res.Text("URL is not a valid calendar", Context.Res.WithStatusCode(400))
 	}
 
 	// Ensure it's user-executed
 	userId, userIdOk := Context.Req.Headers["x-appwrite-user-id"]
 	if !userIdOk || userId == "" {
-		return Context.Res.Text("Unauthorized", 401, nil)
+		return Context.Res.Text("Unauthorized", Context.Res.WithStatusCode(401))
 	}
 
 	// Action
@@ -80,8 +79,8 @@ func CreateCalendar(Context *types.Context, appwriteClient client.Client) types.
 	}))
 
 	if err != nil {
-		return Context.Res.Text(err.Error(), 400, nil)
+		return Context.Res.Text(err.Error(), Context.Res.WithStatusCode(400))
 	}
 
-	return Context.Res.Text("OK", 200, nil)
+	return Context.Res.Text("OK")
 }

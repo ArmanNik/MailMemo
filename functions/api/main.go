@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"github.com/appwrite/sdk-for-go/client"
-	"github.com/open-runtimes/types-for-go/v4"
+	openruntimes "github.com/open-runtimes/types-for-go/v4"
 )
 
-func Main(Context *types.Context) types.ResponseOutput {
+func Main(Context *openruntimes.Context) openruntimes.Response {
 	appwriteClient := client.NewClient()
 	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
 	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
@@ -23,6 +23,6 @@ func Main(Context *types.Context) types.ResponseOutput {
 	case "DELETE /v1/subscriptions":
 		return services.DeleteSubscription(Context, appwriteClient)
 	default:
-		return Context.Res.Text("Not Found", 404, nil)
+		return Context.Res.Text("Not Found", Context.Res.WithStatusCode(404))
 	}
 }

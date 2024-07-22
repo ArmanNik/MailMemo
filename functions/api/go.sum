@@ -8,5 +8,7 @@ github.com/channelmeter/iso8601duration v0.0.0-20150204201828-8da3af7a2a61/go.mo
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/open-runtimes/types-for-go/v4 v4.0.1 h1:DRPNvUJl3yiiDFUxfs3AqToE78PTmr6KZxJdeCVZbdo=
 github.com/open-runtimes/types-for-go/v4 v4.0.1/go.mod h1:88UUMYovXGRbv5keL4uTKDYMWeNtIKV0BbxDRQ18/xY=
+github.com/open-runtimes/types-for-go/v4 v4.0.4 h1:94zFTDNYtF8t7v2TlMqwAedyKftjS4FcGKUmRQ1uNXQ=
+github.com/open-runtimes/types-for-go/v4 v4.0.4/go.mod h1:ab4mDSfgeG4kN8wWpaBSv0Ao3m9P6oEfN5gsXtx+iaI=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.2.0/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=

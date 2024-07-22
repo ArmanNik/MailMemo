@@ -1,12 +1,10 @@
 package services
 
 import (
-	"encoding/json"
-
 	"github.com/appwrite/sdk-for-go/client"
 	"github.com/appwrite/sdk-for-go/query"
 	"github.com/appwrite/sdk-for-go/users"
-	"github.com/open-runtimes/types-for-go/v4"
+	openruntimes "github.com/open-runtimes/types-for-go/v4"
 )
 
 type DeleteSubscriptionBody struct {
@@ -14,11 +12,11 @@ type DeleteSubscriptionBody struct {
 }
 
 // TODO: Security: Use encrypted email values
-func DeleteSubscription(Context *types.Context, appwriteClient client.Client) types.ResponseOutput {
+func DeleteSubscription(Context *openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
 	var body DeleteSubscriptionBody
-	err := json.Unmarshal(Context.Req.BodyBinary(), &body)
+	err := Context.Req.BodyJson(&body)
 	if err != nil {
-		return Context.Res.Text("Invalid body.", 400, nil)
+		return Context.Res.Text("Invalid body.", Context.Res.WithStatusCode(400))
 	}
 
 	// Action
@@ -30,12 +28,12 @@ func DeleteSubscription(Context *types.Context, appwriteClient client.Client) ty
 	}))
 
 	if userErr != nil {
-		return Context.Res.Text(userErr.Error(), 400, nil)
+		return Context.Res.Text(userErr.Error(), Context.Res.WithStatusCode(400))
 	}
 
 	// Return OK here to prevent account existance exposure
 	if len(users.Users) == 0 {
-		return Context.Res.Text("OK", 200, nil)
+		return Context.Res.Text("OK")
 	}
 
 	currentUser := users.Users[0].(map[string]interface{})
@@ -45,8 +43,8 @@ func DeleteSubscription(Context *types.Context, appwriteClient client.Client) ty
 
 	_, err = appwriteUsers.UpdatePrefs(currentUser["$id"].(string), currentPrefs)
 	if err != nil {
-		return Context.Res.Text("Could not mark as unsubscribed", 400, nil)
+		return Context.Res.Text("Could not mark as unsubscribed", Context.Res.WithStatusCode(400))
 	}
 
-	return Context.Res.Text("OK", 200, nil)
+	return Context.Res.Text("OK")
 }
