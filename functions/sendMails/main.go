@@ -7,14 +7,67 @@ import (
 	"strings"
 	"time"
 
-	"github.com/appwrite/sdk-for-go/client"
-	"github.com/appwrite/sdk-for-go/databases"
-	"github.com/appwrite/sdk-for-go/functions"
+	"github.com/appwrite/sdk-for-go/appwrite"
+	"github.com/appwrite/sdk-for-go/models"
 	"github.com/appwrite/sdk-for-go/query"
-	"github.com/appwrite/sdk-for-go/users"
-	"github.com/open-runtimes/types-for-go/v4"
+	"github.com/open-runtimes/types-for-go/v4/openruntimes"
 )
 
+// START-OF-COPY-PASTE
+
+// Appwrite User types
+type AppwriteUserPrefs struct {
+	Timezone     string `json:"timezone"`
+	Period       string `json:"period"`
+	Unsubscribed bool   `json:"unsubscribed"`
+	FirstCal     bool   `json:"firstCal"`
+	Onboarded    bool   `json:"onboarded"`
+}
+
+type AppwriteUser struct {
+	*models.User
+	Prefs AppwriteUserPrefs `json:"prefs"`
+}
+
+type AppwriteUserList struct {
+	*models.UserList
+	Users []AppwriteUser `json:"users"`
+}
+
+// Appwrite Calendar types
+type AppwriteCalendarList struct {
+	*models.DocumentList
+	Documents []AppwriteCalendar `json:"documents"`
+}
+
+type AppwriteCalendar struct {
+	*models.Document
+	Name   string `json:"name"`
+	Color  string `json:"color"`
+	Url    string `json:"url"`
+	UserId string `json:"userId"`
+}
+
+// Appwrite Event types
+
+type AppwriteEventList struct {
+	*models.DocumentList
+	Documents []AppwriteEvent `json:"documents"`
+}
+
+type AppwriteEvent struct {
+	*models.Document
+	Name       string `json:"name"`
+	Uid        string `json:"uid"`
+	CalendarId string `json:"calendarId"`
+	StartAt    string `json:"startAt"`
+	EndAt      string `json:"endAt"`
+	ModifiedAt string `json:"modifiedAt"`
+}
+
+// END-OF-COPY-PASTE
+
+// Function-specific types
 type MailElement struct {
 	Name          string
 	CalendarName  string
@@ -34,9 +87,9 @@ type MailData struct {
 	UpcommingOrder []string
 }
 
-func Main(Context *types.Context) types.ResponseOutput {
+func Main(Context openruntimes.Context) openruntimes.Response {
 	if Context.Req.Method != "POST" {
-		return Context.Res.Text("Not Found", 404, nil)
+		return Context.Res.Text("Not Found", Context.Res.WithStatusCode(404))
 	}
 
 	userId := Context.Req.Headers["x-appwrite-user-id"]
@@ -45,22 +98,30 @@ func Main(Context *types.Context) types.ResponseOutput {
 		userId = Context.Req.BodyText()
 	}
 
-	appwriteClient := client.NewClient()
-	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
-	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
-	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
+	client := appwrite.NewClient(
+		appwrite.WithEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT")),
+		appwrite.WithProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID")),
+		appwrite.WithKey(Context.Req.Headers["x-appwrite-key"]),
+	)
 
-	appwriteFunctions := functions.NewFunctions(appwriteClient)
-	appwriteUsers := users.NewUsers(appwriteClient)
-	appwriteDatabases := databases.NewDatabases(appwriteClient)
+	functions := appwrite.NewFunctions(client)
+	users := appwrite.NewUsers(client)
+	databases := appwrite.NewDatabases(client)
 
-	userStruct, userStructErr := appwriteUsers.Get(userId)
-	if userStructErr != nil {
-		Context.Error(userStructErr)
-		return Context.Res.Text("Error", 500, nil)
+	responseUser, err := users.Get(userId)
+	if err != nil {
+		Context.Error(err)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
-	listCalendars, listCalendarsErr := appwriteDatabases.ListDocuments("main", "calendars", databases.WithListDocumentsQueries([]interface{}{
+	var user AppwriteUser
+	err = responseUser.Decode(&user)
+	if err != nil {
+		Context.Error(err)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
+	}
+
+	responseCalendars, err := databases.ListDocuments("main", "calendars", databases.WithListDocumentsQueries([]string{
 		query.Limit(100),
 		query.Equal("userId", userId),
 		query.Select([]interface{}{
@@ -69,32 +130,35 @@ func Main(Context *types.Context) types.ResponseOutput {
 			"$id",
 		}),
 	}))
-	if listCalendarsErr != nil {
-		Context.Error(listCalendarsErr)
-		return Context.Res.Text("Error", 500, nil)
+	if err != nil {
+		Context.Error(err)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
+	}
+
+	var listCalendars AppwriteCalendarList
+	err = responseCalendars.Decode(&listCalendars)
+	if err != nil {
+		Context.Error(err)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
 	calendarIds := []interface{}{}
 	for _, calendar := range listCalendars.Documents {
-		calendarDocument := calendar.(map[string]interface{})
-		calendarIds = append(calendarIds, calendarDocument["$id"].(string))
+		calendarIds = append(calendarIds, calendar.Id)
 	}
 
-	userEmail := userStruct.Email
-	userPrefs := userStruct.Prefs.(map[string]interface{})
-	timezoneString := userPrefs["timezone"].(string)
-	periodString := userPrefs["period"].(string)
-	isUnsubscribed, _ := userPrefs["unsubscribed"].(bool)
-	userTimezone, timezoneErr := time.LoadLocation(timezoneString)
+	userEmail := user.Email
+	periodString := user.Prefs.Period
+	userTimezone, timezoneErr := time.LoadLocation(user.Prefs.Timezone)
 
-	if isUnsubscribed {
+	if user.Prefs.Unsubscribed {
 		Context.Log("User is unsubscribed")
-		return Context.Res.Text("OK", 200, nil)
+		return Context.Res.Text("OK")
 	}
 
 	if timezoneErr != nil {
 		Context.Error(timezoneErr)
-		return Context.Res.Text("Error", 500, nil)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
 	currentTime := time.Now().In(userTimezone)
@@ -114,16 +178,23 @@ func Main(Context *types.Context) types.ResponseOutput {
 		endAt = endAt.Add(365 * 24 * time.Hour)
 	}
 
-	listEvents, listEventsErr := appwriteDatabases.ListDocuments("main", "events", databases.WithListDocumentsQueries([]interface{}{
+	responseEvents, err := databases.ListDocuments("main", "events", databases.WithListDocumentsQueries([]string{
 		query.Limit(10000),
 		query.OrderAsc("startAt"),
 		query.Equal("calendarId", calendarIds),
 		query.GreaterThanEqual("startAt", currentTime.Format(time.RFC3339)),
 		query.LessThan("endAt", endAt.Format(time.RFC3339)),
 	}))
-	if listEventsErr != nil {
-		Context.Error(listEventsErr)
-		return Context.Res.Text("Error", 500, nil)
+	if err != nil {
+		Context.Error(err)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
+	}
+
+	var events AppwriteEventList
+	err = responseEvents.Decode(&events)
+	if err != nil {
+		Context.Error(err)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
 	mailData := MailData{
@@ -139,21 +210,19 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	todayDate := time.Now().In(userTimezone).Format(time.DateOnly)
 
-	for _, event := range listEvents.Documents {
-		eventDocument := event.(map[string]interface{})
-		eventStartAt, _ := time.Parse(time.RFC3339, eventDocument["startAt"].(string))
-		eventEndAt, _ := time.Parse(time.RFC3339, eventDocument["endAt"].(string))
+	for _, event := range events.Documents {
+		eventStartAt, _ := time.Parse(time.RFC3339, event.StartAt)
+		eventEndAt, _ := time.Parse(time.RFC3339, event.EndAt)
 		eventDayKey := eventStartAt.In(userTimezone).Format(time.DateOnly)
 
-		name := eventDocument["name"].(string)
-		calendarId := eventDocument["calendarId"].(string)
+		name := event.Name
+		calendarId := event.CalendarId
 		calendarName := ""
 		calendarColor := ""
 		for _, calendar := range listCalendars.Documents {
-			calendarDocument := calendar.(map[string]interface{})
-			if calendarDocument["$id"].(string) == calendarId {
-				calendarName = calendarDocument["name"].(string)
-				calendarColor = calendarDocument["color"].(string)
+			if calendar.Id == calendarId {
+				calendarName = calendar.Name
+				calendarColor = calendar.Color
 				break
 			}
 		}
@@ -456,10 +525,10 @@ func Main(Context *types.Context) types.ResponseOutput {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		Context.Error(err)
-		return Context.Res.Text("Error", 500, nil)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
-	_, executionErr := appwriteFunctions.CreateExecution(
+	_, executionErr := functions.CreateExecution(
 		"nodeSendMailInternal",
 		functions.WithCreateExecutionBody(string(jsonData)),
 		functions.WithCreateExecutionAsync(true),
@@ -468,10 +537,10 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	if executionErr != nil {
 		Context.Error(executionErr)
-		return Context.Res.Text("Error", 500, nil)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
-	return Context.Res.Text("OK", 200, nil)
+	return Context.Res.Text("OK")
 }
 
 func getHex(color string) string {

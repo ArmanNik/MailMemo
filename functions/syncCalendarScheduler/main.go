@@ -4,31 +4,79 @@ import (
 	"os"
 	"sync"
 
-	"github.com/appwrite/sdk-for-go/client"
-	"github.com/appwrite/sdk-for-go/databases"
-	"github.com/appwrite/sdk-for-go/functions"
+	"github.com/appwrite/sdk-for-go/appwrite"
 	"github.com/appwrite/sdk-for-go/models"
 	"github.com/appwrite/sdk-for-go/query"
-	"github.com/open-runtimes/types-for-go/v4"
+	"github.com/open-runtimes/types-for-go/v4/openruntimes"
 )
 
-type CalendarDocument struct {
-	*models.Document
-	// Add more if needed
+// START-OF-COPY-PASTE
+
+// Appwrite User types
+type AppwriteUserPrefs struct {
+	Timezone     string `json:"timezone"`
+	Period       string `json:"period"`
+	Unsubscribed bool   `json:"unsubscribed"`
+	FirstCal     bool   `json:"firstCal"`
+	Onboarded    bool   `json:"onboarded"`
 }
 
-func Main(Context *types.Context) types.ResponseOutput {
+type AppwriteUser struct {
+	*models.User
+	Prefs AppwriteUserPrefs `json:"prefs"`
+}
+
+type AppwriteUserList struct {
+	*models.UserList
+	Users []AppwriteUser `json:"users"`
+}
+
+// Appwrite Calendar types
+type AppwriteCalendarList struct {
+	*models.DocumentList
+	Documents []AppwriteCalendar `json:"documents"`
+}
+
+type AppwriteCalendar struct {
+	*models.Document
+	Name   string `json:"name"`
+	Color  string `json:"color"`
+	Url    string `json:"url"`
+	UserId string `json:"userId"`
+}
+
+// Appwrite Event types
+
+type AppwriteEventList struct {
+	*models.DocumentList
+	Documents []AppwriteEvent `json:"documents"`
+}
+
+type AppwriteEvent struct {
+	*models.Document
+	Name       string `json:"name"`
+	Uid        string `json:"uid"`
+	CalendarId string `json:"calendarId"`
+	StartAt    string `json:"startAt"`
+	EndAt      string `json:"endAt"`
+	ModifiedAt string `json:"modifiedAt"`
+}
+
+// END-OF-COPY-PASTE
+
+func Main(Context openruntimes.Context) openruntimes.Response {
 	if Context.Req.Method != "POST" {
-		return Context.Res.Text("Not Found", 404, nil)
+		return Context.Res.Text("Not Found", Context.Res.WithStatusCode(404))
 	}
 
-	appwriteClient := client.NewClient()
-	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
-	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
-	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
+	client := appwrite.NewClient(
+		appwrite.WithEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT")),
+		appwrite.WithProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID")),
+		appwrite.WithKey(Context.Req.Headers["x-appwrite-key"]),
+	)
 
-	appwriteDatabases := databases.NewDatabases(appwriteClient)
-	appwriteFunctions := functions.NewFunctions(appwriteClient)
+	databases := appwrite.NewDatabases(client)
+	functions := appwrite.NewFunctions(client)
 
 	userId := Context.Req.Headers["x-appwrite-user-id"]
 	if userId == "" {
@@ -39,7 +87,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 	for ok := true; ok; ok = (cursor != "") {
 		Context.Log("Page iteration")
 
-		queries := []interface{}{
+		queries := []string{
 			query.Limit(50),
 			query.Select([]interface{}{"$id"}),
 		}
@@ -52,10 +100,10 @@ func Main(Context *types.Context) types.ResponseOutput {
 			queries = append(queries, query.Equal("userId", userId))
 		}
 
-		listResponse, listErr := appwriteDatabases.ListDocuments("main", "calendars", databases.WithListDocumentsQueries(queries))
+		listResponse, listErr := databases.ListDocuments("main", "calendars", databases.WithListDocumentsQueries(queries))
 		if listErr != nil {
 			Context.Error(listErr)
-			return Context.Res.Text("Error", 500, nil)
+			return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 		}
 
 		var wg sync.WaitGroup
@@ -63,15 +111,14 @@ func Main(Context *types.Context) types.ResponseOutput {
 		errCh := make(chan error, len(listResponse.Documents))
 
 		for _, document := range listResponse.Documents {
-			calendarDocument := document.(map[string]interface{})
-			id := calendarDocument["$id"].(string)
+			id := document.Id
 
 			go func(id string) {
 				defer wg.Done()
 
 				Context.Log("Executing sync for calendar " + id)
 
-				_, err := appwriteFunctions.CreateExecution(
+				_, err := functions.CreateExecution(
 					"syncCalendar",
 					functions.WithCreateExecutionAsync(true),
 					functions.WithCreateExecutionMethod("POST"),
@@ -88,12 +135,12 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 		for err := range errCh {
 			Context.Error(err)
-			return Context.Res.Text("Error", 500, nil)
+			return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 		}
 
 		if len(listResponse.Documents) > 0 {
-			lastDocument := listResponse.Documents[len(listResponse.Documents)-1].(map[string]interface{})
-			lastDocumentId := lastDocument["$id"].(string)
+			lastDocument := listResponse.Documents[len(listResponse.Documents)-1]
+			lastDocumentId := lastDocument.Id
 			cursor = lastDocumentId
 		} else {
 			cursor = ""
@@ -101,5 +148,5 @@ func Main(Context *types.Context) types.ResponseOutput {
 	}
 	Context.Log("Done")
 
-	return Context.Res.Text("OK", 200, nil)
+	return Context.Res.Text("OK")
 }

@@ -6,21 +6,75 @@ import (
 	"sync"
 	"time"
 
-	"github.com/appwrite/sdk-for-go/client"
-	"github.com/appwrite/sdk-for-go/functions"
+	"github.com/appwrite/sdk-for-go/appwrite"
+	"github.com/appwrite/sdk-for-go/models"
 	"github.com/appwrite/sdk-for-go/query"
-	"github.com/appwrite/sdk-for-go/users"
-	"github.com/open-runtimes/types-for-go/v4"
+	"github.com/open-runtimes/types-for-go/v4/openruntimes"
 )
 
-func Main(Context *types.Context) types.ResponseOutput {
-	appwriteClient := client.NewClient()
-	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
-	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
-	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
+// START-OF-COPY-PASTE
 
-	appwriteUsers := users.NewUsers(appwriteClient)
-	appwriteFunctions := functions.NewFunctions(appwriteClient)
+// Appwrite User types
+type AppwriteUserPrefs struct {
+	Timezone     string `json:"timezone"`
+	Period       string `json:"period"`
+	Unsubscribed bool   `json:"unsubscribed"`
+	FirstCal     bool   `json:"firstCal"`
+	Onboarded    bool   `json:"onboarded"`
+}
+
+type AppwriteUser struct {
+	*models.User
+	Prefs AppwriteUserPrefs `json:"prefs"`
+}
+
+type AppwriteUserList struct {
+	*models.UserList
+	Users []AppwriteUser `json:"users"`
+}
+
+// Appwrite Calendar types
+type AppwriteCalendarList struct {
+	*models.DocumentList
+	Documents []AppwriteCalendar `json:"documents"`
+}
+
+type AppwriteCalendar struct {
+	*models.Document
+	Name   string `json:"name"`
+	Color  string `json:"color"`
+	Url    string `json:"url"`
+	UserId string `json:"userId"`
+}
+
+// Appwrite Event types
+
+type AppwriteEventList struct {
+	*models.DocumentList
+	Documents []AppwriteEvent `json:"documents"`
+}
+
+type AppwriteEvent struct {
+	*models.Document
+	Name       string `json:"name"`
+	Uid        string `json:"uid"`
+	CalendarId string `json:"calendarId"`
+	StartAt    string `json:"startAt"`
+	EndAt      string `json:"endAt"`
+	ModifiedAt string `json:"modifiedAt"`
+}
+
+// END-OF-COPY-PASTE
+
+func Main(Context openruntimes.Context) openruntimes.Response {
+	client := appwrite.NewClient(
+		appwrite.WithEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT")),
+		appwrite.WithProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID")),
+		appwrite.WithKey(Context.Req.Headers["x-appwrite-key"]),
+	)
+
+	users := appwrite.NewUsers(client)
+	functions := appwrite.NewFunctions(client)
 
 	hour, minute, _ := time.Now().Clock()
 	weekday := int(time.Now().Weekday())
@@ -70,7 +124,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 			orQueries = append(orQueries, query.Contains("labels", currentDate))
 		}
 
-		queries := []interface{}{
+		queries := []string{
 			query.Limit(50),
 			query.Or(orQueries),
 		}
@@ -79,20 +133,24 @@ func Main(Context *types.Context) types.ResponseOutput {
 			queries = append(queries, query.CursorAfter(cursor))
 		}
 
-		listResponse, listErr := appwriteUsers.List(users.WithListQueries(queries))
-		if listErr != nil {
-			Context.Error(listErr)
-			return Context.Res.Text("Error", 500, nil)
+		usersResponse, err := users.List(users.WithListQueries(queries))
+		if err != nil {
+			Context.Error(err)
+			return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
+		}
+
+		var users AppwriteUserList
+		err = usersResponse.Decode(&users)
+		if err != nil {
+			Context.Error(err)
+			return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 		}
 
 		var wg sync.WaitGroup
-		errCh := make(chan error, len(listResponse.Users))
+		errCh := make(chan error, len(users.Users))
 
-		for _, user := range listResponse.Users {
-			userStruct := user.(map[string]interface{})
-			userLabels := userStruct["labels"].([]interface{})
-			userLabel := userLabels[0].(string)
-
+		for _, user := range users.Users {
+			userLabel := user.Labels[0]
 			hasLabel := false
 
 			for _, currentDate := range currentDateStrings {
@@ -116,7 +174,7 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 				Context.Log("Sending mail to " + userId + ": " + userEmail)
 
-				_, err := appwriteFunctions.CreateExecution(
+				_, err := functions.CreateExecution(
 					"sendMails",
 					functions.WithCreateExecutionAsync(true),
 					functions.WithCreateExecutionMethod("POST"),
@@ -133,14 +191,12 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 		for err := range errCh {
 			Context.Error(err)
-			return Context.Res.Text("Error", 500, nil)
+			return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 		}
 
-		if len(listResponse.Users) > 0 {
-			lastDocument := listResponse.Users[len(listResponse.Users)-1].(map[string]interface{})
-
-			lastDocumentId := lastDocument["$id"].(string)
-			cursor = lastDocumentId
+		if len(users.Users) > 0 {
+			lastDocument := users.Users[len(users.Users)-1]
+			cursor = lastDocument.Id
 		} else {
 			cursor = ""
 		}
@@ -148,5 +204,5 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	Context.Log("Done")
 
-	return Context.Res.Text("OK", 200, nil)
+	return Context.Res.Text("OK")
 }

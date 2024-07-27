@@ -8,15 +8,69 @@ import (
 	"time"
 
 	"github.com/apognu/gocal"
-	"github.com/appwrite/sdk-for-go/client"
+	"github.com/appwrite/sdk-for-go/appwrite"
 	"github.com/appwrite/sdk-for-go/databases"
 	"github.com/appwrite/sdk-for-go/id"
+	"github.com/appwrite/sdk-for-go/models"
 	"github.com/appwrite/sdk-for-go/permission"
 	"github.com/appwrite/sdk-for-go/query"
 	"github.com/appwrite/sdk-for-go/role"
-	"github.com/appwrite/sdk-for-go/users"
-	"github.com/open-runtimes/types-for-go/v4"
+	"github.com/open-runtimes/types-for-go/v4/openruntimes"
 )
+
+// START-OF-COPY-PASTE
+
+// Appwrite User types
+type AppwriteUserPrefs struct {
+	Timezone     string `json:"timezone"`
+	Period       string `json:"period"`
+	Unsubscribed bool   `json:"unsubscribed"`
+	FirstCal     bool   `json:"firstCal"`
+	Onboarded    bool   `json:"onboarded"`
+}
+
+type AppwriteUser struct {
+	*models.User
+	Prefs AppwriteUserPrefs `json:"prefs"`
+}
+
+type AppwriteUserList struct {
+	*models.UserList
+	Users []AppwriteUser `json:"users"`
+}
+
+// Appwrite Calendar types
+type AppwriteCalendarList struct {
+	*models.DocumentList
+	Documents []AppwriteCalendar `json:"documents"`
+}
+
+type AppwriteCalendar struct {
+	*models.Document
+	Name   string `json:"name"`
+	Color  string `json:"color"`
+	Url    string `json:"url"`
+	UserId string `json:"userId"`
+}
+
+// Appwrite Event types
+
+type AppwriteEventList struct {
+	*models.DocumentList
+	Documents []AppwriteEvent `json:"documents"`
+}
+
+type AppwriteEvent struct {
+	*models.Document
+	Name       string `json:"name"`
+	Uid        string `json:"uid"`
+	CalendarId string `json:"calendarId"`
+	StartAt    string `json:"startAt"`
+	EndAt      string `json:"endAt"`
+	ModifiedAt string `json:"modifiedAt"`
+}
+
+// END-OF-COPY-PASTE
 
 type EventMinimal struct {
 	Uid          string
@@ -26,69 +80,80 @@ type EventMinimal struct {
 	LastModified *time.Time
 }
 
-func Main(Context *types.Context) types.ResponseOutput {
+func Main(Context openruntimes.Context) openruntimes.Response {
 	if Context.Req.Method != "POST" {
-		return Context.Res.Text("Not Found", 404, nil)
+		return Context.Res.Text("Not Found", Context.Res.WithStatusCode(404))
 	}
 
-	appwriteClient := client.NewClient()
-	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
-	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
-	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
+	client := appwrite.NewClient(
+		appwrite.WithEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT")),
+		appwrite.WithProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID")),
+		appwrite.WithKey(Context.Req.Headers["x-appwrite-key"]),
+	)
 
-	appwriteUsers := users.NewUsers(appwriteClient)
-	appwriteDatabases := databases.NewDatabases(appwriteClient)
+	users := appwrite.NewUsers(client)
+	databases := appwrite.NewDatabases(client)
 
 	calendarId := Context.Req.BodyText()
 
 	if calendarId == "" {
 		Context.Log("Body missing")
-		return Context.Res.Text("Error", 500, nil)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
 	Context.Log(calendarId)
 
 	// TODO: Use getDocument
-	calendarResponse, err := appwriteDatabases.ListDocuments("main", "calendars", databases.WithListDocumentsQueries([]interface{}{
+	calendarResponse, err := databases.ListDocuments("main", "calendars", databases.WithListDocumentsQueries([]string{
 		query.Equal("$id", calendarId),
 	}))
 
 	if err != nil {
 		Context.Error("Cannot get calendar:")
 		Context.Error(err)
-		return Context.Res.Text("Error", 500, nil)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
 	if len(calendarResponse.Documents) == 0 {
 		Context.Log(errors.New("Calendar not found"))
-		return Context.Res.Text("Error", 500, nil)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
-	calendarDocument := calendarResponse.Documents[0].(map[string]interface{})
-	calendarUrl := calendarDocument["url"].(string)
-	userId := calendarDocument["userId"].(string)
+	var calendars AppwriteCalendarList
+	err = calendarResponse.Decode(&calendars)
 
-	userStruct, userStructErr := appwriteUsers.Get(userId)
-	if userStructErr != nil {
+	calendarUrl := calendars.Documents[0].Url
+	userId := calendars.Documents[0].UserId
+
+	userResponse, err := users.Get(userId)
+	if err != nil {
 		Context.Error("Cannot get user:")
-		Context.Error(userStructErr)
-		return Context.Res.Text("Error", 500, nil)
+		Context.Error(err)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
-	userPrefs := userStruct.Prefs.(map[string]interface{})
-	timezoneString := userPrefs["timezone"].(string)
+
+	var user AppwriteUser
+	err = userResponse.Decode(&user)
+	if err != nil {
+		Context.Error("Cannot decode user:")
+		Context.Error(err)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
+	}
+
+	timezoneString := user.Prefs.Timezone
 	userTimezone, timezoneErr := time.LoadLocation(timezoneString)
 
 	if timezoneErr != nil {
 		Context.Error("Cannot load timezone:")
 		Context.Error(timezoneErr)
-		return Context.Res.Text("Error", 500, nil)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
 	calResp, err := http.Get(calendarUrl)
 	if err != nil {
 		Context.Error("Cannot get calendar from URL:")
 		Context.Error(err)
-		return Context.Res.Text("Error", 500, nil)
+		return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 	}
 
 	defer calResp.Body.Close()
@@ -119,11 +184,11 @@ func Main(Context *types.Context) types.ResponseOutput {
 		}
 
 		if i == 49 {
-			err = processEventsChunk(Context, userId, calendarId, appwriteDatabases, eventChunk)
+			err = processEventsChunk(Context, userId, calendarId, databases, eventChunk)
 			if err != nil {
 				Context.Error("Cannot process chunk:")
 				Context.Error(err)
-				return Context.Res.Text("Error", 500, nil)
+				return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 			}
 
 			eventChunk = [50]EventMinimal{}
@@ -135,11 +200,11 @@ func Main(Context *types.Context) types.ResponseOutput {
 	}
 
 	if len(eventChunk) > 0 {
-		err = processEventsChunk(Context, userId, calendarId, appwriteDatabases, eventChunk)
+		err = processEventsChunk(Context, userId, calendarId, databases, eventChunk)
 		if err != nil {
 			Context.Error("Cannot process final chunk:")
 			Context.Error(err)
-			return Context.Res.Text("Error", 500, nil)
+			return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 		}
 	}
 
@@ -149,16 +214,16 @@ func Main(Context *types.Context) types.ResponseOutput {
 	for ok := true; ok; ok = (cursor != "") {
 		Context.Log("Existing page iteration")
 
-		var queries []interface{}
+		var queries []string
 
 		if cursor == "INIT" {
-			queries = []interface{}{
+			queries = []string{
 				query.Equal("calendarId", calendarId),
 				query.Select([]interface{}{"$id", "uid"}),
 				query.Limit(1000),
 			}
 		} else {
-			queries = []interface{}{
+			queries = []string{
 				query.Equal("calendarId", calendarId),
 				query.Select([]interface{}{"$id", "uid"}),
 				query.Limit(1000),
@@ -166,17 +231,24 @@ func Main(Context *types.Context) types.ResponseOutput {
 			}
 		}
 
-		listResponse, listErr := appwriteDatabases.ListDocuments("main", "events", databases.WithListDocumentsQueries(queries))
-		if listErr != nil {
+		listResponse, err := databases.ListDocuments("main", "events", databases.WithListDocumentsQueries(queries))
+		if err != nil {
 			Context.Error("Cannot list documents during deletion:")
-			Context.Error(listErr)
-			return Context.Res.Text("Error", 500, nil)
+			Context.Error(err)
+			return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 		}
 
-		for _, document := range listResponse.Documents {
-			eventDocument := document.(map[string]interface{})
-			id := eventDocument["$id"].(string)
-			uid := eventDocument["uid"].(string)
+		var events AppwriteEventList
+		err = listResponse.Decode(&events)
+		if err != nil {
+			Context.Error("Cannot decode documents during deletion:")
+			Context.Error(err)
+			return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
+		}
+
+		for _, document := range events.Documents {
+			id := document.Id
+			uid := document.Uid
 
 			found := false
 			for _, e := range c.Events {
@@ -190,18 +262,18 @@ func Main(Context *types.Context) types.ResponseOutput {
 			if found == false {
 				Context.Log("Deleting " + uid)
 
-				_, err := appwriteDatabases.DeleteDocument("main", "events", id)
+				_, err := databases.DeleteDocument("main", "events", id)
 				if err != nil {
 					Context.Error("Cannot delete event:")
 					Context.Error(err)
-					return Context.Res.Text("Error", 500, nil)
+					return Context.Res.Text("Error", Context.Res.WithStatusCode(500))
 				}
 			}
 		}
 
 		if len(listResponse.Documents) > 0 {
-			lastDocument := listResponse.Documents[len(listResponse.Documents)-1].(map[string]interface{})
-			lastDocumentId := lastDocument["$id"].(string)
+			lastDocument := listResponse.Documents[len(listResponse.Documents)-1]
+			lastDocumentId := lastDocument.Id
 			cursor = lastDocumentId
 		} else {
 			cursor = ""
@@ -210,10 +282,10 @@ func Main(Context *types.Context) types.ResponseOutput {
 
 	Context.Log("Finished")
 
-	return Context.Res.Text("OK", 200, nil)
+	return Context.Res.Text("OK")
 }
 
-func processEventsChunk(Context *types.Context, userId string, calendarId string, appwriteDatabases *databases.Databases, events [50]EventMinimal) error {
+func processEventsChunk(Context openruntimes.Context, userId string, calendarId string, databases *databases.Databases, events [50]EventMinimal) error {
 	eventIds := []interface{}{}
 
 	for _, event := range events {
@@ -228,12 +300,19 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 		return nil
 	}
 
-	eventsResponse, err := appwriteDatabases.ListDocuments("main", "events", databases.WithListDocumentsQueries([]interface{}{
+	eventsResponse, err := databases.ListDocuments("main", "events", databases.WithListDocumentsQueries([]string{
 		query.Equal("uid", eventIds),
 		query.Limit(50),
 		query.Equal("calendarId", calendarId),
 		query.Select([]interface{}{"$id", "uid", "modifiedAt"}),
 	}))
+
+	if err != nil {
+		return err
+	}
+
+	var remoteEvents AppwriteEventList
+	err = eventsResponse.Decode(&remoteEvents)
 
 	if err != nil {
 		return err
@@ -247,30 +326,29 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 			continue
 		}
 
-		var existingEventDocument map[string]interface{} = nil
+		var existingEventDocument AppwriteEvent = AppwriteEvent{}
 
-		for _, document := range eventsResponse.Documents {
-			eventDocument := document.(map[string]interface{})
-			if eventDocument["uid"].(string) == event.Uid {
-				existingEventDocument = eventDocument
+		for _, document := range remoteEvents.Documents {
+			if document.Uid == event.Uid {
+				existingEventDocument = document
 			}
 		}
 
-		if existingEventDocument == nil {
+		if existingEventDocument == (AppwriteEvent{}) {
 			Context.Log("Inserting " + event.Uid)
 
 			wg.Add(1)
 			go func(e EventMinimal) {
 				defer wg.Done()
 
-				_, err := appwriteDatabases.CreateDocument("main", "events", id.Unique(), map[string]interface{}{
+				_, err := databases.CreateDocument("main", "events", id.Unique(), map[string]interface{}{
 					"calendarId": calendarId,
 					"uid":        e.Uid,
 					"name":       e.Summary,
 					"startAt":    e.Start.Format(time.RFC3339),
 					"endAt":      e.End.Format(time.RFC3339),
 					"modifiedAt": e.LastModified.Format(time.RFC3339),
-				}, databases.WithCreateDocumentPermissions([]interface{}{
+				}, databases.WithCreateDocumentPermissions([]string{
 					permission.Read(role.User(userId, "")),
 				}))
 
@@ -280,7 +358,7 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 			}(event)
 		} else {
 			newLastModified := event.LastModified
-			oldLastModified, err := time.Parse(time.RFC3339, existingEventDocument["modifiedAt"].(string))
+			oldLastModified, err := time.Parse(time.RFC3339, existingEventDocument.ModifiedAt)
 
 			if err != nil {
 				return err
@@ -293,7 +371,7 @@ func processEventsChunk(Context *types.Context, userId string, calendarId string
 				go func(e EventMinimal) {
 					defer wg.Done()
 
-					_, err := appwriteDatabases.UpdateDocument("main", "events", existingEventDocument["$id"].(string), databases.WithUpdateDocumentData(map[string]interface{}{
+					_, err := databases.UpdateDocument("main", "events", existingEventDocument.Id, databases.WithUpdateDocumentData(map[string]interface{}{
 						"name":       e.Summary,
 						"startAt":    e.Start.Format(time.RFC3339),
 						"endAt":      e.End.Format(time.RFC3339),

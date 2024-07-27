@@ -4,15 +4,16 @@ import (
 	"openruntimes/handler/services"
 	"os"
 
-	"github.com/appwrite/sdk-for-go/client"
-	openruntimes "github.com/open-runtimes/types-for-go/v4"
+	"github.com/appwrite/sdk-for-go/appwrite"
+	"github.com/open-runtimes/types-for-go/v4/openruntimes"
 )
 
 func Main(Context openruntimes.Context) openruntimes.Response {
-	appwriteClient := client.NewClient()
-	appwriteClient.SetEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT"))
-	appwriteClient.SetProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID"))
-	appwriteClient.SetKey(Context.Req.Headers["x-appwrite-key"])
+	appwriteClient := appwrite.NewClient(
+		appwrite.WithEndpoint(os.Getenv("APPWRITE_FUNCTION_API_ENDPOINT")),
+		appwrite.WithProject(os.Getenv("APPWRITE_FUNCTION_PROJECT_ID")),
+		appwrite.WithKey(Context.Req.Headers["x-appwrite-key"]),
+	)
 
 	action := Context.Req.Method + " " + Context.Req.Path
 	switch a := action; a {

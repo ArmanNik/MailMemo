@@ -3,9 +3,9 @@ package services
 import (
 	"strconv"
 
-	"github.com/appwrite/sdk-for-go/client"
-	"github.com/appwrite/sdk-for-go/users"
-	openruntimes "github.com/open-runtimes/types-for-go/v4"
+	"github.com/appwrite/sdk-for-go/appwrite"
+	c "github.com/appwrite/sdk-for-go/client"
+	"github.com/open-runtimes/types-for-go/v4/openruntimes"
 )
 
 type UpdateSchedulerIntervalBody struct {
@@ -16,7 +16,7 @@ type UpdateSchedulerIntervalBody struct {
 	FrequencyDetails string `json:"frequencyDetails"`
 }
 
-func UpdateSchedulerInterval(Context openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
+func UpdateSchedulerInterval(Context openruntimes.Context, client c.Client) openruntimes.Response {
 	var body UpdateSchedulerIntervalBody
 	err := Context.Req.BodyJson(&body)
 	if err != nil {
@@ -69,8 +69,8 @@ func UpdateSchedulerInterval(Context openruntimes.Context, appwriteClient client
 	// Action
 	label := strconv.Itoa(body.Hours) + "T" + strconv.Itoa(body.Minutes) + "T" + body.Format + "T" + body.Frequency + "T" + body.FrequencyDetails
 
-	appwriteUsers := users.NewUsers(appwriteClient)
-	_, err = appwriteUsers.UpdateLabels(userId, []interface{}{
+	users := appwrite.NewUsers(client)
+	_, err = users.UpdateLabels(userId, []string{
 		label,
 	})
 

@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/apognu/gocal"
-	"github.com/appwrite/sdk-for-go/client"
-	"github.com/appwrite/sdk-for-go/databases"
+	"github.com/appwrite/sdk-for-go/appwrite"
+	c "github.com/appwrite/sdk-for-go/client"
 	"github.com/appwrite/sdk-for-go/id"
 	"github.com/appwrite/sdk-for-go/permission"
 	"github.com/appwrite/sdk-for-go/role"
-	openruntimes "github.com/open-runtimes/types-for-go/v4"
+	"github.com/open-runtimes/types-for-go/v4/openruntimes"
 )
 
 type CreateCalendarBody struct {
@@ -20,7 +20,7 @@ type CreateCalendarBody struct {
 	Color string `json:"color"`
 }
 
-func CreateCalendar(Context openruntimes.Context, appwriteClient client.Client) openruntimes.Response {
+func CreateCalendar(Context openruntimes.Context, client c.Client) openruntimes.Response {
 	var body CreateCalendarBody
 	err := Context.Req.BodyJson(&body)
 	if err != nil {
@@ -68,13 +68,13 @@ func CreateCalendar(Context openruntimes.Context, appwriteClient client.Client) 
 	}
 
 	// Action
-	appwriteDatabase := databases.NewDatabases(appwriteClient)
-	_, err = appwriteDatabase.CreateDocument("main", "calendars", id.Unique(), map[string]interface{}{
+	databases := appwrite.NewDatabases(client)
+	_, err = databases.CreateDocument("main", "calendars", id.Unique(), map[string]interface{}{
 		"url":    body.Url,
 		"name":   body.Name,
 		"color":  body.Color,
 		"userId": userId,
-	}, databases.WithCreateDocumentPermissions([]interface{}{
+	}, databases.WithCreateDocumentPermissions([]string{
 		permission.Read(role.User(userId, "")),
 	}))
 
