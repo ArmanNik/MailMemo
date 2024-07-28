@@ -165,12 +165,11 @@ func Main(Context openruntimes.Context) openruntimes.Response {
 			}
 
 			wg.Add(1)
-			go func(u interface{}) {
+			go func(u AppwriteUser) {
 				defer wg.Done()
 
-				userStruct := u.(map[string]interface{})
-				userId := userStruct["$id"].(string)
-				userEmail := userStruct["email"].(string)
+				userId := u.Id
+				userEmail := u.Email
 
 				Context.Log("Sending mail to " + userId + ": " + userEmail)
 
