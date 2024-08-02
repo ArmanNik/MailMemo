@@ -320,7 +320,7 @@ func Main(Context openruntimes.Context) openruntimes.Response {
 			}
 
 			TodayHtmlElements = append(TodayHtmlElements, `
-				<mj-section background-color="#a8a8a9" padding="1px" border-radius="`+borderRadius+`" css-class="small-wrapper">
+				<mj-section background-color="#3c3c3f" padding="1px" border-radius="`+borderRadius+`" css-class="small-wrapper">
 					<mj-column border-radius="`+borderRadius+`" background-color="#141416" padding="16px">
 					<mj-text font-weight="300" font-size="12px" color="#C3C3C6" padding="0px 0px 12px 0px">
 						`+event.Time+` &nbsp;&nbsp;<span style="color: #303031;">|</span>&nbsp;
